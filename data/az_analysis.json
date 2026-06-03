@@ -1,0 +1,24 @@
+{
+  "location": "Azerbaijan (Baku)",
+  "currency": "AZN",
+  "total_bouquets": 10,
+  "average_price": 103.5,
+  "min_price": 55,
+  "max_price": 250,
+  "price_range": "55 — 250 AZN",
+  "popular_flowers": [
+    "rosa",
+    "hipsofila",
+    "gerbera",
+    "lale",
+    "tulip"
+  ],
+  "delivery_services": [
+    "Flora.az",
+    "Gulzada",
+    "Bukety.az",
+    "Çiçek Evi"
+  ],
+  "avg_delivery_time": "2-3 saatlik",
+  "last_updated": "2026-06-03T16:27:42.891126"
+}

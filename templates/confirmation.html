@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Thank you — order confirmed{% endblock %}
+
+{% block hero %}{% endblock %}
+{% block stats %}{% endblock %}
+
+{% block content %}
+  <div class="confirmation" style="padding-top:120px">
+    <div style="font-size:64px;margin-bottom:16px">🌸</div>
+    <h1>Thank you, {{ order.customer_name }}!</h1>
+    <p style="color:var(--muted);font-size:17px;margin-top:8px">
+      Your order for <strong>{{ order.offer.title }}</strong> has been received and will be processed shortly.
+    </p>
+    <ul class="order-summary">
+      <li><strong>Quantity:</strong> {{ order.quantity }}</li>
+      <li><strong>Delivery address:</strong> {{ order.address }}</li>
+      <li><strong>Phone:</strong> {{ order.phone }}</li>
+      <li><strong>Total:</strong> {{ order.quantity * order.offer.price }} ₼</li>
+    </ul>
+
+    {% if order.payment and order.payment.status == 'paid' %}
+      <p style="color:var(--green);font-weight:600">✅ Payment completed. ID: {{ order.payment.id }}</p>
+    {% else %}
+      <form method="post" action="#" style="margin-top:18px">
+        <input type="hidden" id="order_json" value='{{ order | tojson | safe }}'>
+        <button class="button primary" data-pay-sandbox="" data-order='{{ order | tojson | safe }}' type="button">
+          Pay now (sandbox)
+        </button>
+      </form>
+    {% endif %}
+
+    <a class="button primary" href="{{ url_for('index') }}" style="margin-top:24px;display:inline-flex">
+      ← Back to catalogue
+    </a>
+  </div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Best Bouquets in Baku — Price Comparison{% endblock %}
+
+{% block content %}
+
+  {# ── MARKET ANALYSIS ── #}
+  <section class="summary reveal" id="catalog">
+    <div class="section-title">
+      <span class="section-eyebrow">📊 Market Analysis</span>
+      <h2>Best deals <em>right now</em></h2>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <strong>Total offers</strong>
+        <div class="meta-value">{{ analysis.total_offers }}</div>
+      </div>
+      <div class="meta-item">
+        <strong>Average price</strong>
+        <div class="meta-value">{{ analysis.average_price }} ₼</div>
+      </div>
+      <div class="meta-item">
+        <strong>Price range</strong>
+        <div class="meta-value">{{ analysis.min_price }} — {{ analysis.max_price }} ₼</div>
+      </div>
+      <div class="meta-item">
+        <strong>Popular flowers</strong>
+        <div class="meta-value" style="font-size:15px;line-height:1.4">{{ analysis.top_flowers | join(' · ') }}</div>
+      </div>
+    </div>
+  </section>
+
+  {# ── OFFERS GRID ── #}
+  <section class="offers-section">
+    <div class="section-title reveal">
+      <span class="section-eyebrow">🛍️ Catalogue</span>
+      <h2>Bouquets from <em>Baku shops</em></h2>
+    </div>
+
+    <div class="offers">
+      {% for offer in offers %}
+        <article class="offer-card reveal">
+
+          <div class="offer-image">
+            {% if offer.photo %}
+              <img src="{{ offer.photo }}" alt="{{ offer.title }}" loading="lazy">
+            {% endif %}
+            <div class="badge">{{ offer.category }}</div>
+            <div class="card-bloom" data-bloom></div>
+          </div>
+
+          <div class="card-top">
+            <h3>{{ offer.title }}</h3>
+          </div>
+
+          {% if offer.shop %}
+          <div style="padding:0 22px 2px;display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;background:#fff0f7;color:var(--rose);border:1px solid rgba(232,23,93,.2);
+                         padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.3px">
+              🏪 {{ offer.shop }}
+            </span>
+          </div>
+          {% endif %}
+
+          <p class="desc">{{ offer.description }}</p>
+          <p class="composition"><strong>Composition:</strong> {{ offer.composition | join(', ') }}</p>
+
+          {% if offer.delivery_time %}
+            <p class="delivery-time"><small>⏱️ {{ offer.delivery_time }}</small></p>
+          {% endif %}
+
+          <div class="card-bottom">
+            <div class="price">{{ offer.price }}<span class="price-currency">₼</span></div>
+            <a class="button primary" href="{{ url_for('order', offer_id=offer.id) }}">Order now</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ── DELIVERY INFO ── #}
+  <section id="delivery" style="
+    background: linear-gradient(135deg, #1a0a14 0%, #3d1225 100%);
+    border-radius: 28px;
+    padding: 64px 48px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  ">
+    <div class="section-title reveal" style="margin-bottom:40px">
+      <span class="section-eyebrow" style="color:var(--gold)">🚗 Delivery</span>
+      <h2 style="color:#fff">Fast, careful, <em>all across Baku</em></h2>
+    </div>
+    <div style="
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:20px;
+      max-width:900px;
+      margin:0 auto;
+    " class="reveal">
+      {% for feat in [
+        ('🚗','From 60 minutes','Delivery across the whole city'),
+        ('🎁','Free packaging','Greeting card included'),
+        ('🌡️','Thermal boxes','Flowers stay fresh even in heat'),
+        ('📅','Pre-order','We remember your special date'),
+        ('💳','Any payment','Card, cash or WhatsApp'),
+      ] %}
+      <div style="
+        background:rgba(255,255,255,.06);
+        border:1px solid rgba(232,23,93,.3);
+        border-radius:18px;
+        padding:24px 20px;
+        text-align:center;
+      ">
+        <div style="font-size:32px;margin-bottom:10px">{{ feat[0] }}</div>
+        <div style="font-weight:700;color:#fff;font-size:15px;margin-bottom:4px">{{ feat[1] }}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.55)">{{ feat[2] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+{% endblock %}

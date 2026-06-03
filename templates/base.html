@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Dream Bouquet — Baku{% endblock %} — Azerbaijani Flowers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+
+    <!-- floating petals canvas -->
+    <canvas id="petals-canvas"></canvas>
+
+    <!-- WhatsApp FAB -->
+    <a class="fab-wa" href="https://wa.me/994501234567" title="WhatsApp">💬</a>
+
+    <!-- toast notification -->
+    <div class="toast" id="toast">🌸 Order placed!</div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="logo" href="{{ url_for('index') }}">
+          <span class="logo-bloom">🌸</span>
+          <span class="brand">Dream<span class="brand-accent">Bouquet</span></span>
+        </a>
+        <nav class="nav">
+          <a href="{{ url_for('index') }}">Catalogue</a>
+          <a href="#delivery">Delivery</a>
+          <a href="#contact">Contact</a>
+          <a href="tel:+994501234567" class="nav-cta">📞 +994 50 123-45-67</a>
+        </nav>
+      </div>
+
+      {% block hero %}
+      <div class="hero">
+        <div class="hero-bg-img"></div>
+        <div class="bloom-container" id="bloom-container"></div>
+        <div class="hero-content">
+          <div class="hero-eyebrow">🌹 Baku · Fresh flowers every day</div>
+          <h1>Bouquets for<br><span class="accent">special</span> moments</h1>
+          <p class="hero-sub">Live flowers from Azerbaijani gardens, delivered across all of Baku.<br>Real photos, real prices in Manat.</p>
+          <div class="hero-buttons">
+            <a class="btn-primary" href="{{ url_for('index') }}#catalog">Browse catalogue</a>
+            <a class="btn-outline" href="tel:+994501234567">Call us</a>
+          </div>
+        </div>
+        <div class="hero-scroll">Scroll</div>
+      </div>
+      {% endblock %}
+    </header>
+
+    {% block stats %}
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num" data-target="12000">0</div>
+        <div class="stat-label">Happy customers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="350">0</div>
+        <div class="stat-label">Flower varieties</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="8">0</div>
+        <div class="stat-label">Years in market</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="60">0</div>
+        <div class="stat-label">Min. delivery</div>
+      </div>
+    </div>
+    {% endblock %}
+
+    <main class="container main-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer" id="contact">
+      <div class="footer-inner">
+        <div class="footer-brand">Dream<span class="footer-brand-accent">Bouquet</span></div>
+        <div class="footer-links">
+          <a href="tel:+994501234567">📞 +994 50 123-45-67</a>
+          <a href="https://wa.me/994501234567">💬 WhatsApp</a>
+          <a href="#">📸 Instagram</a>
+          <a href="#">📍 Nizami St 12, Baku</a>
+        </div>
+        <div class="footer-copy">© {{ now.year }} Azerbaijan Flowers — Baku flower marketplace · Daily 08:00–22:00</div>
+      </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

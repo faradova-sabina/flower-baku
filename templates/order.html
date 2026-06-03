@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Place Order — {{ offer.title }}{% endblock %}
+
+{% block hero %}{% endblock %}
+{% block stats %}{% endblock %}
+
+{% block content %}
+  <div class="order-card" style="padding-top:110px">
+    {% with messages = get_flashed_messages(category_filter=['error']) %}
+      {% if messages %}
+        <div class="error">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="offer-summary">
+      {% if offer.photo %}
+        <div class="offer-image">
+          <img src="{{ offer.photo }}" alt="{{ offer.title }}">
+        </div>
+      {% endif %}
+      <div class="card-top">
+        <h3>{{ offer.title }}</h3>
+      </div>
+      <p class="desc">{{ offer.category }} · delivery: {{ offer.delivery_time }}</p>
+      <p class="desc">{{ offer.description }}</p>
+      <p class="composition"><strong>Price:</strong> {{ offer.price }} ₼</p>
+      {% if offer.shop %}
+        <p class="composition"><small>Supplier: {{ offer.shop }}</small></p>
+      {% endif %}
+    </div>
+
+    <form method="post" class="order-form">
+      <h2>Place your order</h2>
+
+      <label for="name">Your name</label>
+      <input id="name" name="name" required placeholder="Full name">
+
+      <label for="phone">Phone number</label>
+      <input id="phone" name="phone" required placeholder="+994 ...">
+
+      <label for="address">Delivery address in Baku</label>
+      <textarea id="address" name="address" rows="3" required placeholder="Enter your Baku address..."></textarea>
+
+      <label for="quantity">Quantity</label>
+      <select id="quantity" name="quantity">
+        {% for qty in [1,2,3,4,5] %}
+          <option value="{{ qty }}">{{ qty }}</option>
+        {% endfor %}
+      </select>
+
+      <button class="button primary" type="submit" style="margin-top:20px;width:100%;justify-content:center">
+        Confirm order
+      </button>
+    </form>
+  </div>
+{% endblock %}
