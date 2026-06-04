@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="{{ lang }}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Dream Bouquet — Баку{% endblock %} — Цветы в Азербайджане</title>
+    <title>{% block title %}DreamBouquet — Баку{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -12,6 +12,9 @@
   </head>
   <body>
 
+    <!-- Global SVG bloom animations layer -->
+    <div class="bloom-global-layer" id="bloom-global-layer" aria-hidden="true"></div>
+
     <!-- floating petals canvas -->
     <canvas id="petals-canvas"></canvas>
 
@@ -19,16 +22,23 @@
     <a class="fab-wa" href="https://wa.me/994702011930" title="WhatsApp">💬</a>
 
     <!-- toast notification -->
-    <div class="toast" id="toast">🌸 Заказ оформлен!</div>
+    <div class="toast" id="toast">🌸 {{ t.catalog_btn_order }}!</div>
 
     <!-- Mobile nav overlay -->
     <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
-      <button class="nav-overlay-close" id="nav-overlay-close" aria-label="Закрыть меню">✕</button>
-      <a href="{{ url_for('index') }}#catalog" data-section="catalog">Каталог</a>
-      <a href="{{ url_for('index') }}#quiz" data-section="quiz">Подбор букета</a>
-      <a href="{{ url_for('index') }}#delivery" data-section="delivery">Доставка</a>
-      <a href="#contact" data-section="contact">Контакт</a>
+      <button class="nav-overlay-close" id="nav-overlay-close" aria-label="Close">✕</button>
+      <a href="{{ url_for('index') }}#catalog">{{ t.nav_catalog }}</a>
+      <a href="{{ url_for('index') }}#quiz">{{ t.nav_quiz }}</a>
+      <a href="{{ url_for('builder') }}">{{ t.nav_builder }}</a>
+      <a href="{{ url_for('index') }}#delivery">{{ t.nav_delivery }}</a>
+      <a href="#contact">{{ t.nav_contact }}</a>
       <a href="tel:+994702011930" class="nav-overlay-cta">📞 +994 70 201-19-30</a>
+      <!-- Lang switcher mobile -->
+      <div class="lang-switcher-mobile">
+        {% for l in all_langs %}
+        <a href="{{ url_for('set_lang', lang=l.code) }}" class="lang-btn{% if l.code == lang %} active{% endif %}">{{ l.name }}</a>
+        {% endfor %}
+      </div>
     </div>
 
     <header class="site-header">
@@ -37,14 +47,21 @@
           <span class="logo-bloom">🌸</span>
           <span class="brand">Dream<span class="brand-accent">Bouquet</span></span>
         </a>
-        <nav class="nav" role="navigation" aria-label="Основная навигация">
-          <a href="{{ url_for('index') }}#catalog" data-section="catalog">Каталог</a>
-          <a href="{{ url_for('index') }}#quiz" data-section="quiz">Подбор букета</a>
-          <a href="{{ url_for('index') }}#delivery" data-section="delivery">Доставка</a>
-          <a href="#contact" data-section="contact">Контакт</a>
+        <nav class="nav" role="navigation">
+          <a href="{{ url_for('index') }}#catalog">{{ t.nav_catalog }}</a>
+          <a href="{{ url_for('index') }}#quiz">{{ t.nav_quiz }}</a>
+          <a href="{{ url_for('builder') }}" class="nav-builder-link">{{ t.nav_builder }}</a>
+          <a href="{{ url_for('index') }}#delivery">{{ t.nav_delivery }}</a>
+          <a href="#contact">{{ t.nav_contact }}</a>
+          <!-- Language switcher -->
+          <div class="lang-switcher">
+            {% for l in all_langs %}
+            <a href="{{ url_for('set_lang', lang=l.code) }}" class="lang-btn{% if l.code == lang %} active{% endif %}">{{ l.name }}</a>
+            {% endfor %}
+          </div>
           <a href="tel:+994702011930" class="nav-cta">📞 +994 70 201-19-30</a>
         </nav>
-        <button class="nav-hamburger" id="nav-hamburger" aria-label="Открыть меню" aria-expanded="false">
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -53,16 +70,18 @@
       <div class="hero">
         <div class="hero-bg-img"></div>
         <div class="bloom-container" id="bloom-container"></div>
+        <!-- Animated SVG flowers in hero -->
+        <div class="hero-flowers" id="hero-flowers" aria-hidden="true"></div>
         <div class="hero-content">
-          <div class="hero-eyebrow">🌹 Баку · Свежие цветы каждый день</div>
-          <h1>Букеты для<br><span class="accent">особых</span> моментов</h1>
-          <p class="hero-sub">Живые цветы из азербайджанских садов, доставка по всему Баку.<br>Реальные фото, реальные цены в манатах.</p>
+          <div class="hero-eyebrow">{{ t.hero_eyebrow }}</div>
+          <h1>{{ t.hero_title | safe }}</h1>
+          <p class="hero-sub">{{ t.hero_sub | safe }}</p>
           <div class="hero-buttons">
-            <a class="btn-primary" href="{{ url_for('index') }}#catalog">Смотреть каталог</a>
-            <a class="btn-outline" href="{{ url_for('index') }}#quiz">🌸 Подобрать букет</a>
+            <a class="btn-primary" href="{{ url_for('index') }}#catalog">{{ t.hero_btn_catalog }}</a>
+            <a class="btn-outline" href="{{ url_for('builder') }}">{{ t.hero_btn_builder }}</a>
           </div>
         </div>
-        <div class="hero-scroll">Листайте</div>
+        <div class="hero-scroll">{{ t.hero_scroll }}</div>
       </div>
       {% endblock %}
     </header>
@@ -71,19 +90,19 @@
     <div class="stats-bar">
       <div class="stat">
         <div class="stat-num" data-target="12000">0</div>
-        <div class="stat-label">Довольных клиентов</div>
+        <div class="stat-label">{{ t.stat_clients }}</div>
       </div>
       <div class="stat">
         <div class="stat-num" data-target="350">0</div>
-        <div class="stat-label">Сортов цветов</div>
+        <div class="stat-label">{{ t.stat_varieties }}</div>
       </div>
       <div class="stat">
         <div class="stat-num" data-target="8">0</div>
-        <div class="stat-label">Лет на рынке</div>
+        <div class="stat-label">{{ t.stat_years }}</div>
       </div>
       <div class="stat">
         <div class="stat-num" data-target="60">0</div>
-        <div class="stat-label">Мин. доставка</div>
+        <div class="stat-label">{{ t.stat_delivery }}</div>
       </div>
     </div>
     {% endblock %}
@@ -102,7 +121,7 @@
           <a href="#">📸 Instagram</a>
           <a href="#">📍 ул. Низами 12, Баку</a>
         </div>
-        <div class="footer-copy">© {{ now.year }} Azerbaijan Flowers — маркетплейс цветов Баку · Ежедневно 08:00–22:00</div>
+        <div class="footer-copy">© {{ now.year }} {{ t.footer_copy }}</div>
       </div>
     </footer>
 
