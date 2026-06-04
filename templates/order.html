@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Place Order — {{ offer.title }}{% endblock %}
+{% block title %}Оформить заказ — {{ offer.title }}{% endblock %}
 
 {% block hero %}{% endblock %}
 {% block stats %}{% endblock %}
@@ -22,27 +22,27 @@
       <div class="card-top">
         <h3>{{ offer.title }}</h3>
       </div>
-      <p class="desc">{{ offer.category }} · delivery: {{ offer.delivery_time }}</p>
+      <p class="desc">{{ offer.category }} · {{ offer.delivery_time }}</p>
       <p class="desc">{{ offer.description }}</p>
-      <p class="composition"><strong>Price:</strong> {{ offer.price }} ₼</p>
+      <p class="composition"><strong>Цена:</strong> {{ offer.price }} ₼</p>
       {% if offer.shop %}
-        <p class="composition"><small>Supplier: {{ offer.shop }}</small></p>
+        <p class="composition"><small>🏪 Магазин: {{ offer.shop }}</small></p>
       {% endif %}
     </div>
 
     <form method="post" class="order-form">
-      <h2>Place your order</h2>
+      <h2>Оформить заказ</h2>
 
-      <label for="name">Your name</label>
-      <input id="name" name="name" required placeholder="Full name">
+      <label for="name">Ваше имя</label>
+      <input id="name" name="name" required placeholder="Полное имя">
 
-      <label for="phone">Phone number</label>
+      <label for="phone">Номер телефона</label>
       <input id="phone" name="phone" required placeholder="+994 ...">
 
-      <label for="address">Delivery address in Baku</label>
-      <textarea id="address" name="address" rows="3" required placeholder="Enter your Baku address..."></textarea>
+      <label for="address">Адрес доставки в Баку</label>
+      <textarea id="address" name="address" rows="3" required placeholder="Введите адрес в Баку..."></textarea>
 
-      <label for="quantity">Quantity</label>
+      <label for="quantity">Количество</label>
       <select id="quantity" name="quantity">
         {% for qty in [1,2,3,4,5] %}
           <option value="{{ qty }}">{{ qty }}</option>
@@ -50,7 +50,7 @@
       </select>
 
       <button class="button primary" type="submit" style="margin-top:20px;width:100%;justify-content:center">
-        Confirm order
+        Подтвердить заказ
       </button>
     </form>
   </div>

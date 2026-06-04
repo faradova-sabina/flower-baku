@@ -302,11 +302,193 @@ document.addEventListener('DOMContentLoaded', function () {
         if (data.status === 'ok') {
           window.location.href = '/confirmation_paid?order_id=' + encodeURIComponent(data.order_id)
         } else {
-          alert('Payment failed: ' + (data.error || 'unknown error'))
+          alert('Ошибка оплаты: ' + (data.error || 'неизвестная ошибка'))
         }
       } catch {
-        alert('Network error during payment')
+        alert('Ошибка сети при оплате')
       }
     })
   })
 })
+
+// ── OCCASION FILTER TABS ─────────────────────────────────────
+;(function () {
+  const tabs  = document.querySelectorAll('.occasion-tab')
+  const cards = document.querySelectorAll('#offers-grid .offer-card')
+  if (!tabs.length) return
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'))
+      tab.classList.add('active')
+
+      const occ = tab.dataset.occasion
+      let visible = 0
+      cards.forEach(card => {
+        const cardOcc = card.dataset.occasion || ''
+        const show = occ === 'all' || cardOcc.split(',').includes(occ)
+        card.style.display = show ? '' : 'none'
+        if (show) visible++
+      })
+
+      // Update URL without reload for shareability
+      const url = new URL(window.location)
+      if (occ === 'all') url.searchParams.delete('occasion')
+      else url.searchParams.set('occasion', occ)
+      window.history.replaceState({}, '', url)
+    })
+  })
+})()
+
+// ── QUESTIONNAIRE ────────────────────────────────────────────
+;(function () {
+  const TOTAL_STEPS = 5
+  let currentStep   = 1
+  const answers     = {}
+
+  const stepLabel   = document.getElementById('quiz-step-label')
+  const progressBar = document.getElementById('quiz-progress-bar')
+  const backBtn     = document.getElementById('quiz-back')
+  const nextBtn     = document.getElementById('quiz-next')
+  const submitBtn   = document.getElementById('quiz-submit')
+  const resultsEl   = document.getElementById('quiz-results')
+  const resultsGrid = document.getElementById('quiz-results-grid')
+  const resetBtn    = document.getElementById('quiz-reset')
+  const quizCard    = document.querySelector('.quiz-card')
+
+  if (!stepLabel) return  // not on index page
+
+  function getStepEl(n) {
+    return document.querySelector(`.quiz-step[data-step="${n}"]`)
+  }
+
+  function showStep(n) {
+    document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'))
+    getStepEl(n).classList.add('active')
+
+    stepLabel.textContent  = `Шаг ${n} из ${TOTAL_STEPS}`
+    progressBar.style.width = (n / TOTAL_STEPS * 100) + '%'
+
+    backBtn.style.display   = n > 1 ? '' : 'none'
+    nextBtn.style.display   = n < TOTAL_STEPS ? '' : 'none'
+    submitBtn.style.display = n === TOTAL_STEPS ? '' : 'none'
+
+    refreshNextState(n)
+  }
+
+  function refreshNextState(n) {
+    const field = getStepEl(n)?.querySelector('[data-field]')?.dataset.field
+    const hasAnswer = field && answers[field]
+    nextBtn.disabled   = !hasAnswer
+    submitBtn.disabled = !hasAnswer
+  }
+
+  // Chip selection
+  document.querySelectorAll('.quiz-chips').forEach(group => {
+    group.querySelectorAll('.quiz-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        group.querySelectorAll('.quiz-chip').forEach(c => c.classList.remove('selected'))
+        chip.classList.add('selected')
+        answers[group.dataset.field] = chip.dataset.value
+        refreshNextState(currentStep)
+      })
+    })
+  })
+
+  backBtn?.addEventListener('click', () => {
+    if (currentStep > 1) { currentStep--; showStep(currentStep) }
+  })
+
+  nextBtn?.addEventListener('click', () => {
+    if (currentStep < TOTAL_STEPS) { currentStep++; showStep(currentStep) }
+  })
+
+  submitBtn?.addEventListener('click', () => {
+    runRecommendation()
+  })
+
+  resetBtn?.addEventListener('click', () => {
+    answers.for_whom = answers.occasion = answers.age_range = answers.budget = answers.flowers = undefined
+    document.querySelectorAll('.quiz-chip').forEach(c => c.classList.remove('selected'))
+    document.querySelectorAll('.offer-card').forEach(c => {
+      c.classList.remove('quiz-match', 'quiz-top-match')
+    })
+    resultsEl.style.display = 'none'
+    quizCard.style.display  = ''
+    currentStep = 1
+    showStep(1)
+  })
+
+  function scoreOffer(offer, ans) {
+    let s = 0
+    const occ      = ans.occasion  || ''
+    const forWhom  = ans.for_whom  || ''
+    const ageRange = ans.age_range || ''
+    const budget   = parseInt(ans.budget || '9999')
+    const flowers  = ans.flowers   || ''
+
+    if (occ && Array.isArray(offer.occasion) && offer.occasion.includes(occ))              s += 40
+    if (forWhom && Array.isArray(offer.for_whom) && offer.for_whom.includes(forWhom))       s += 25
+    if (ageRange && Array.isArray(offer.age_range) && offer.age_range.includes(ageRange))   s += 15
+
+    const price = offer.price || 9999
+    if (price <= budget) {
+      s += 20
+      if (price >= budget * 0.6) s += 8   // sweet-spot bonus
+    } else {
+      s -= 20
+    }
+
+    if (flowers && flowers !== 'any') {
+      const comp = (offer.composition || []).join(' ').toLowerCase()
+      if (comp.includes(flowers.toLowerCase())) s += 15
+    }
+
+    return s
+  }
+
+  function runRecommendation() {
+    const allOffers = window.ALL_OFFERS || []
+    const scored = allOffers
+      .map(o => ({ ...o, _score: scoreOffer(o, answers) }))
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 3)
+
+    // Hide quiz card, show results
+    quizCard.style.display  = 'none'
+    resultsEl.style.display = ''
+    resultsGrid.innerHTML   = ''
+
+    scored.forEach((offer, idx) => {
+      const card = document.createElement('a')
+      card.href  = '/order/' + offer.id
+      card.className = 'quiz-result-card' + (idx === 0 ? ' best-match' : '')
+      card.innerHTML = `
+        <img class="quiz-result-img" src="${offer.photo || ''}" alt="${offer.title}" loading="lazy">
+        <div class="quiz-result-body">
+          <div class="quiz-result-name">${offer.title}</div>
+          <div class="quiz-result-shop">🏪 ${offer.shop || ''}</div>
+          <div class="quiz-result-price">${offer.price}₼</div>
+          <div class="quiz-result-delivery">⏱️ ${offer.delivery_time || ''}</div>
+        </div>
+      `
+      resultsGrid.appendChild(card)
+    })
+
+    // Also highlight matching cards in main catalog
+    const topId  = scored[0]?.id
+    const matchIds = scored.map(o => o.id)
+    document.querySelectorAll('#offers-grid .offer-card').forEach(card => {
+      const id = card.dataset.id
+      card.classList.remove('quiz-match', 'quiz-top-match')
+      if (id === topId)            card.classList.add('quiz-top-match')
+      else if (matchIds.includes(id)) card.classList.add('quiz-match')
+    })
+
+    // Smooth scroll to results
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  // Init
+  showStep(1)
+})()
