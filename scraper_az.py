@@ -98,7 +98,7 @@ TYPE_KEYWORDS = {
                "marshmallow", "candy", "sweet", "chocolate", "зефирный"],
 }
 
-def classify_type(title: str, composition: list) -> str:
+def classify_type(title: str, composition: list[str]) -> str:
     text = (title + " " + " ".join(composition)).lower()
     for type_key, keywords in TYPE_KEYWORDS.items():
         if any(kw in text for kw in keywords):
