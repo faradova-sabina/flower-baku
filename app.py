@@ -231,6 +231,9 @@ def order(offer_id):
             "address": address,
             "quantity": int(quantity) if quantity.isdigit() else 1,
             "offer": offer,
+            "display_price": int(request.form.get("display_price", offer['display_price'])),
+            "delivery_cost": int(request.form.get("delivery_cost", 0)),
+            "distance_km": float(request.form.get("distance_km", 0)),
             "created": datetime.utcnow().isoformat(),
         }
         orders_dir = BASE_DIR / 'data' / 'orders'
