@@ -1720,3 +1720,40 @@ input:focus, textarea:focus, select:focus {
   .occasion-card { min-width: 90px; padding: 14px 16px; font-size: 12px; }
   .occasion-card .occ-icon { font-size: 26px; }
 }
+
+/* ── Realistic Flower Bloom Animations ── */
+.flower {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+.flower svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.flower .petal {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+  opacity: 0;
+}
+.flower.blooming .petal {
+  animation: petal-open 1.2s ease-out forwards;
+}
+@keyframes petal-open {
+  0%   { transform: scaleY(0); opacity: 0; }
+  35%  { transform: scaleY(1.1); opacity: 0.95; }
+  65%  { transform: scaleY(0.97); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* scroll-garden container */
+#scroll-garden {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
