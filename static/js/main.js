@@ -95,62 +95,6 @@ function makeFlowerSVG(cfg, outerR = 22, innerR = 15, nPetals = 8) {
   return `<svg viewBox="-55 -55 110 110" style="overflow:visible;width:100%;height:100%">${markup}</svg>`
 }
 
-// ── FLOATING PETAL CANVAS ────────────────────────────────────
-const canvas = document.getElementById('petals-canvas')
-const ctx    = canvas.getContext('2d')
-
-function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight }
-resizeCanvas()
-window.addEventListener('resize', resizeCanvas)
-
-const PETAL_COLORS = [
-  '#ff006e','#ff80ba','#ffb703','#ff4081','#f06292',
-  '#ce93d8','#ffc8dd','#fff','#ea80fc','#ffab40',
-]
-
-class Petal {
-  constructor() { this.reset(true) }
-  reset(init = false) {
-    this.x    = Math.random() * canvas.width
-    this.y    = init ? Math.random() * canvas.height : -30
-    this.size = 5 + Math.random() * 13
-    this.vy   = 0.45 + Math.random() * 1.05
-    this.vx   = (Math.random() - .5) * .8
-    this.rot  = Math.random() * Math.PI * 2
-    this.rotV = (Math.random() - .5) * .055
-    this.alpha = .3 + Math.random() * .5
-    this.color = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)]
-    this.swayA = 16 + Math.random() * 26
-    this.swayF = .012 + Math.random() * .018
-    this.swayO = Math.random() * Math.PI * 2
-  }
-  update(t) {
-    this.y += this.vy
-    this.x += Math.sin(t * this.swayF + this.swayO) * .55 + this.vx
-    this.rot += this.rotV
-    if (this.y > canvas.height + 40) this.reset()
-  }
-  draw() {
-    ctx.save()
-    ctx.translate(this.x, this.y)
-    ctx.rotate(this.rot)
-    ctx.globalAlpha = this.alpha
-    ctx.fillStyle = this.color
-    ctx.beginPath()
-    ctx.ellipse(0, 0, this.size, this.size * .46, 0, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.restore()
-  }
-}
-
-const petals = Array.from({ length: 70 }, () => new Petal())
-let tick = 0
-;(function animPetals() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  tick++
-  petals.forEach(p => { p.update(tick); p.draw() })
-  requestAnimationFrame(animPetals)
-})()
 
 // ── HERO BLOOMS ──────────────────────────────────────────────
 function spawnHeroBloom(container) {
