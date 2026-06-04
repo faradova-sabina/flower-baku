@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Thank you — order confirmed{% endblock %}
+{% block title %}{% if lang == 'ru' %}Заказ оформлен{% elif lang == 'az' %}Sifariş təsdiqləndi{% else %}Order confirmed{% endif %} — DreamBouquet{% endblock %}
 
 {% block hero %}{% endblock %}
 {% block stats %}{% endblock %}
@@ -8,30 +8,62 @@
 {% block content %}
   <div class="confirmation" style="padding-top:120px">
     <div style="font-size:64px;margin-bottom:16px">🌸</div>
-    <h1>Thank you, {{ order.customer_name }}!</h1>
+    <h1>
+      {% if lang == 'ru' %}Спасибо, {{ order.customer_name }}!
+      {% elif lang == 'az' %}Təşəkkür edirik, {{ order.customer_name }}!
+      {% else %}Thank you, {{ order.customer_name }}!{% endif %}
+    </h1>
     <p style="color:var(--muted);font-size:17px;margin-top:8px">
-      Your order for <strong>{{ order.offer.title }}</strong> has been received and will be processed shortly.
+      {% if lang == 'ru' %}Ваш заказ получен и скоро будет обработан.
+      {% elif lang == 'az' %}Sifarişiniz qəbul edildi.
+      {% else %}Your order has been received and will be processed shortly.{% endif %}
     </p>
+
     <ul class="order-summary">
-      <li><strong>Quantity:</strong> {{ order.quantity }}</li>
-      <li><strong>Delivery address:</strong> {{ order.address }}</li>
-      <li><strong>Phone:</strong> {{ order.phone }}</li>
-      <li><strong>Total:</strong> {{ order.quantity * order.offer.price }} ₼</li>
+      <li>
+        <strong>{% if lang == 'ru' %}Количество{% elif lang == 'az' %}Miqdar{% else %}Quantity{% endif %}:</strong>
+        {{ order.quantity }}
+      </li>
+      <li>
+        <strong>{% if lang == 'ru' %}Адрес{% elif lang == 'az' %}Ünvan{% else %}Address{% endif %}:</strong>
+        {{ order.address }}
+      </li>
+      <li>
+        <strong>{% if lang == 'ru' %}Телефон{% elif lang == 'az' %}Telefon{% else %}Phone{% endif %}:</strong>
+        {{ order.phone }}
+      </li>
+      <li>
+        <strong>{{ t.order_bouquet_price }}:</strong>
+        {{ order.display_price * order.quantity }} ₼
+      </li>
+      {% if order.delivery_cost %}
+      <li>
+        <strong>{{ t.delivery_cost }}{% if order.distance_km %} ({{ order.distance_km }} {{ t.delivery_km }}){% endif %}:</strong>
+        {{ order.delivery_cost }} ₼
+      </li>
+      {% endif %}
+      <li style="font-weight:700;border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+        <strong>{{ t.order_total }}:</strong>
+        {{ order.display_price * order.quantity + (order.delivery_cost or 0) }} ₼
+      </li>
     </ul>
 
     {% if order.payment and order.payment.status == 'paid' %}
-      <p style="color:var(--green);font-weight:600">✅ Payment completed. ID: {{ order.payment.id }}</p>
+      <p style="color:var(--green);font-weight:600">✅
+        {% if lang == 'ru' %}Оплата выполнена. ID: {{ order.payment.id }}
+        {% elif lang == 'az' %}Ödəniş tamamlandı. ID: {{ order.payment.id }}
+        {% else %}Payment completed. ID: {{ order.payment.id }}{% endif %}
+      </p>
     {% else %}
-      <form method="post" action="#" style="margin-top:18px">
-        <input type="hidden" id="order_json" value='{{ order | tojson | safe }}'>
+      <form style="margin-top:18px">
         <button class="button primary" data-pay-sandbox="" data-order='{{ order | tojson | safe }}' type="button">
-          Pay now (sandbox)
+          {% if lang == 'ru' %}Оплатить (тест){% elif lang == 'az' %}Ödə (test){% else %}Pay now (sandbox){% endif %}
         </button>
       </form>
     {% endif %}
 
     <a class="button primary" href="{{ url_for('index') }}" style="margin-top:24px;display:inline-flex">
-      ← Back to catalogue
+      ← {% if lang == 'ru' %}В каталог{% elif lang == 'az' %}Kataloqa{% else %}Back to catalogue{% endif %}
     </a>
   </div>
 {% endblock %}
