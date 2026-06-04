@@ -908,38 +908,101 @@ document.getElementById('builder-order-btn').addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════════
-   HAND PRESENTATION ANIMATION
+   CINEMATIC HAND ANIMATION — 5 phases
 ══════════════════════════════════════════════ */
 function playHandAnimation() {
+  if (bouquetItems.length === 0) return;
+  controls.autoRotate = false;
+  const startPos  = camera.position.clone();
+  const endPos    = new THREE.Vector3(0, 2, 4);
+  const startTime = performance.now();
+
+  function zoomIn() {
+    const t    = Math.min((performance.now() - startTime) / 800, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    camera.position.lerpVectors(startPos, endPos, ease);
+    camera.lookAt(0, 1.5, 0);
+    if (t < 1) requestAnimationFrame(zoomIn);
+    else showOverlay();
+  }
+  requestAnimationFrame(zoomIn);
+}
+
+function showOverlay() {
   const overlay    = document.getElementById('hand-overlay');
-  const handScene  = document.getElementById('hand-scene');
-  const handCanvas = document.getElementById('hand-bouquet-canvas');
+  const snapCanvas = document.getElementById('hand-bouquet-canvas');
 
-  // Draw the bouquet snapshot onto the hand canvas
-  drawBouquetSnapshot(handCanvas);
+  renderer.render(scene, camera);
+  const ctx = snapCanvas.getContext('2d');
+  ctx.clearRect(0, 0, snapCanvas.width, snapCanvas.height);
+  ctx.drawImage(renderer.domElement, 0, 0, snapCanvas.width, snapCanvas.height);
 
-  overlay.classList.add('active');
-  overlay.style.display = 'flex';
-
-  // Reset animation
+  const handScene = document.getElementById('hand-scene');
+  handScene.classList.remove('pushing');
   handScene.style.animation = 'none';
-  handScene.offsetHeight; // reflow
-  handScene.style.animation = 'hand-present 3.2s cubic-bezier(.22,1,.36,1) forwards';
 
-  const bg = document.getElementById('hand-overlay-bg');
-  bg.style.animation = 'none';
-  bg.offsetHeight;
-  bg.style.animation = 'overlay-bg-fade 3.2s ease forwards';
+  const wrapper = document.getElementById('hand-wrapper');
+  wrapper.classList.remove('rising');
 
-  // After animation, redirect to WhatsApp
+  const svg = document.getElementById('hand-svg');
+  svg.classList.remove('hand-grip');
+  svg.classList.add('hand-open');
+
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('active'));
+  setTimeout(raiseHand, 400);
+}
+
+function raiseHand() {
+  const wrapper = document.getElementById('hand-wrapper');
+  wrapper.classList.add('rising');
+  setTimeout(() => {
+    const svg = document.getElementById('hand-svg');
+    svg.classList.remove('hand-open');
+    svg.classList.add('hand-grip');
+    setTimeout(pushToScreen, 600);
+  }, 400);
+}
+
+function spawnParticles() {
+  const overlay = document.getElementById('hand-overlay');
+  const colors  = bouquetItems.map(i => i.color).filter(Boolean);
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'hand-particle';
+    p.style.cssText = [
+      `left:${40 + Math.random() * 20}%`,
+      `top:${30 + Math.random() * 20}%`,
+      `background:${colors[i % colors.length] || '#e8175d'}`,
+      `animation-delay:${(Math.random() * 0.3).toFixed(2)}s`,
+      `--dx:${Math.round((Math.random() - 0.5) * 200)}px`,
+      `--dy:${Math.round((Math.random() - 0.5) * 200)}px`,
+    ].join(';');
+    overlay.appendChild(p);
+  }
+}
+
+function pushToScreen() {
+  const handScene = document.getElementById('hand-scene');
+  handScene.classList.add('pushing');
+  spawnParticles();
+  setTimeout(finishAnimation, 1000);
+}
+
+function finishAnimation() {
+  const overlay = document.getElementById('hand-overlay');
+  overlay.classList.add('fading');
   setTimeout(() => {
     overlay.style.display = 'none';
-    overlay.classList.remove('active');
-
+    overlay.classList.remove('active', 'fading');
+    overlay.querySelectorAll('.hand-particle').forEach(p => p.remove());
+    camera.position.set(0, 3, 9);
+    controls.target.set(0, 1.5, 0);
+    controls.autoRotate = true;
+    controls.update();
     const msg = buildWhatsAppMessage();
-    const url = `https://wa.me/994702011930?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
-  }, 3400);
+    window.open(`https://wa.me/994702011930?text=${encodeURIComponent(msg)}`, '_blank');
+  }, 700);
 }
 
 function buildWhatsAppMessage() {
@@ -959,73 +1022,6 @@ function buildWhatsAppMessage() {
   return lines.join('\n');
 }
 
-function drawBouquetSnapshot(canvas) {
-  // Capture current Three.js frame onto the hand canvas
-  renderer.render(scene, camera);
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width;
-  const h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
-
-  // Draw the Three.js frame (scaled)
-  ctx.drawImage(renderer.domElement, 0, 0, w, h * 0.62);
-
-  // Draw SVG hand below
-  drawHandSVG(ctx, w, h);
-}
-
-function drawHandSVG(ctx, w, h) {
-  // Draw a stylized hand holding the bouquet stem
-  const hy = h * 0.55;  // hand starts here
-
-  ctx.save();
-  ctx.fillStyle = '#f2c5a0';
-  ctx.strokeStyle = '#d4956a';
-  ctx.lineWidth = 2;
-
-  // Palm
-  ctx.beginPath();
-  ctx.ellipse(w * 0.5, hy + h * 0.22, w * 0.22, h * 0.2, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-
-  // Fingers (simplified)
-  const fingers = [
-    [w*0.28, hy + 0.02*h, w*0.055, h*0.14],
-    [w*0.36, hy - 0.04*h, w*0.055, h*0.16],
-    [w*0.5,  hy - 0.06*h, w*0.055, h*0.17],
-    [w*0.64, hy - 0.03*h, w*0.055, h*0.15],
-    [w*0.74, hy + 0.04*h, w*0.045, h*0.12],
-  ];
-
-  fingers.forEach(([x, y, rx, ry]) => {
-    ctx.beginPath();
-    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#f2c5a0';
-    ctx.fill();
-    ctx.strokeStyle = '#d4956a';
-    ctx.stroke();
-  });
-
-  // Stem held in hand
-  ctx.beginPath();
-  ctx.strokeStyle = '#2a7a35';
-  ctx.lineWidth = 6;
-  ctx.moveTo(w * 0.5, hy - 0.05 * h);
-  ctx.lineTo(w * 0.5, hy + 0.38 * h);
-  ctx.stroke();
-
-  // Glow around hand
-  const grd = ctx.createRadialGradient(w*0.5, hy+0.15*h, 10, w*0.5, hy+0.15*h, w*0.45);
-  grd.addColorStop(0, 'rgba(232,23,93,0.2)');
-  grd.addColorStop(1, 'rgba(232,23,93,0)');
-  ctx.beginPath();
-  ctx.arc(w*0.5, hy+0.15*h, w*0.45, 0, Math.PI*2);
-  ctx.fillStyle = grd;
-  ctx.fill();
-
-  ctx.restore();
-}
 
 // Add shake keyframe
 const style = document.createElement('style');
