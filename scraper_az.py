@@ -1,284 +1,445 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Scraper for Azerbaijani flower shops - collect real bouquets, prices, and photos
+Auto-scraper for buket.az — fetches real bouquets with real photos every 5 minutes.
+Writes to data/az_offers.json with magical Russian descriptions.
 """
 import json
-import os
+import time
+import hashlib
+import logging
 from pathlib import Path
 from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
-import time
 
-class AzFlowerScraper:
-    def __init__(self):
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-        self.flowers = []
-        self.base_dir = Path(__file__).parent / "data"
-        self.base_dir.mkdir(exist_ok=True)
-        
-    def scrape_az_florist_sites(self):
-        """Scrape popular Azerbaijani flower delivery sites"""
-        
-        # Top Azerbaijani flower shops
-        sites = {
-            "Gülzada Çiçekçilik": {
-                "url": "https://www.gulzada.az",
-                "name": "Gülzada çiçekçilik",
-                "city": "Baku"
-            },
-            "Flora.az": {
-                "url": "https://flora.az",
-                "name": "Flora.az",
-                "city": "Baku"
-            },
-            "Bukety.az": {
-                "url": "https://bukety.az",
-                "name": "Bukety.az",
-                "city": "Baku"
-            },
-            "Çiçek Evi": {
-                "url": "https://cicekevi.az",
-                "name": "Çiçek Evi",
-                "city": "Baku"
-            }
-        }
-        
-        print("[INFO] Scraping Azerbaijani flower shops...\n")
-        
-        for shop_name, shop_info in sites.items():
-            try:
-                print(f"[*] Connecting to {shop_info['name']}...")
-                response = requests.get(shop_info['url'], headers=self.headers, timeout=10)
-                
-                if response.status_code == 200:
-                    print(f"[OK] Connected to {shop_info['name']}")
-                    self.parse_site(response.content, shop_info)
-                else:
-                    print(f"[!] {shop_info['name']} returned {response.status_code}")
-                    
-            except requests.exceptions.RequestException as e:
-                print(f"[ERROR] Error connecting to {shop_info['name']}: {e}")
-            
-            time.sleep(2)  # Rate limiting
-    
-    def parse_site(self, content, site_info):
-        """Parse flower shop website"""
-        soup = BeautifulSoup(content, 'html.parser')
-        # Parse bouquets from site
-        # This will vary by site structure
-        pass
-    
-    def add_manual_bouquets(self):
-        """Add manually verified Azerbaijani bouquets with real prices (2024-2026)"""
-        
-        bouquets = [
-            {
-                "id": "1",
-                "title": "Романтический букет",
-                "category": "Романтика",
-                "composition": ["красная роза", "гипсофила", "зелень"],
-                "price": 85,
-                "currency": "AZN",
-                "description": "Сочный букет из красных роз с нежной гипсофилой для особого случая.",
-                "delivery_time": "Доставка 2 часа",
-                "photo": "https://images.unsplash.com/photo-1603530220472-0566e49af4f2?w=500&h=500&fit=crop",
-                "shop": "Flora.az",
-                "shop_url": "https://flora.az/bouquets/romantic-red-roses"
-            },
-            {
-                "id": "2",
-                "title": "Праздничный букет",
-                "category": "Праздничные",
-                "composition": ["герберы", "лилии", "эвкалипт"],
-                "price": 75,
-                "currency": "AZN",
-                "description": "Яркий праздничный букет в тёплых оттенках для семьи и друзей.",
-                "delivery_time": "Доставка 1 час",
-                "photo": "https://images.unsplash.com/photo-1585372737946-c62e86fcaf00?w=500&h=500&fit=crop",
-                "shop": "Gulzada",
-                "shop_url": "https://gulzada.az/holiday-flowers"
-            },
-            {
-                "id": "3",
-                "title": "Бизнес-букет",
-                "category": "Деликатные",
-                "composition": ["орхидеи", "тюльпаны", "аспидистра"],
-                "price": 110,
-                "currency": "AZN",
-                "description": "Современный изысканный букет для корпоративных подарков и деловых встреч.",
-                "delivery_time": "Доставка 3 часа",
-                "photo": "https://images.unsplash.com/photo-1519763696556-dcc92e0d4bff?w=500&h=500&fit=crop",
-                "shop": "Bukety.az",
-                "shop_url": "https://bukety.az/corporate"
-            },
-            {
-                "id": "4",
-                "title": "Сезонный букет",
-                "category": "Сезонные",
-                "composition": ["пион", "астры", "папоротник"],
-                "price": 95,
-                "currency": "AZN",
-                "description": "Нежный букет из сезонных цветов для весеннего настроения.",
-                "delivery_time": "Доставка 2 часа",
-                "photo": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=500&h=500&fit=crop",
-                "shop": "Çiçek Evi",
-                "shop_url": "https://cicekevi.az/seasonal"
-            },
-            {
-                "id": "5",
-                "title": "Букет невесты",
-                "category": "Свадьба",
-                "composition": ["белая роза", "пион", "гипсофила", "зелень эвкалипта"],
-                "price": 250,
-                "currency": "AZN",
-                "description": "Элегантный букет невесты с белыми розами и пионами для вашего особого дня.",
-                "delivery_time": "Предзаказ за 3 дня",
-                "photo": "https://images.unsplash.com/photo-1490481651236-d7a6707d46c1?w=500&h=500&fit=crop",
-                "shop": "Flora.az",
-                "shop_url": "https://flora.az/wedding"
-            },
-            {
-                "id": "6",
-                "title": "Букет соболезнований",
-                "category": "Спец. случаи",
-                "composition": ["белая хризантема", "белая роза", "гренальди"],
-                "price": 80,
-                "currency": "AZN",
-                "description": "Скромный букет белых цветов для выражения соболезнований.",
-                "delivery_time": "Срочная доставка 30 минут",
-                "photo": "https://images.unsplash.com/photo-1529148482759-b649effa3142?w=500&h=500&fit=crop",
-                "shop": "Gulzada",
-                "shop_url": "https://gulzada.az/condolences"
-            },
-            {
-                "id": "7",
-                "title": "Букет из подсолнухов",
-                "category": "Яркие",
-                "composition": ["подсолнух", "календула", "зелень"],
-                "price": 65,
-                "currency": "AZN",
-                "description": "Яркий и солнечный букет подсолнухов для хорошего настроения.",
-                "delivery_time": "Доставка 1.5 часа",
-                "photo": "https://images.unsplash.com/photo-1583527294688-d0213dc5d969?w=500&h=500&fit=crop",
-                "shop": "Bukety.az",
-                "shop_url": "https://bukety.az/sunflowers"
-            },
-            {
-                "id": "8",
-                "title": "Букет из тюльпанов",
-                "category": "Весна",
-                "composition": ["разноцветные тюльпаны", "зелень"],
-                "price": 70,
-                "currency": "AZN",
-                "description": "Весенний букет из разноцветных тюльпанов прямо из теплицы.",
-                "delivery_time": "Доставка 2 часа",
-                "photo": "https://images.unsplash.com/photo-1604580545247-9e7e3b06dd83?w=500&h=500&fit=crop",
-                "shop": "Çiçek Evi",
-                "shop_url": "https://cicekevi.az/tulips"
-            },
-            {
-                "id": "9",
-                "title": "Экзотический букет",
-                "category": "Премиум",
-                "composition": ["антуриум", "птица рая", "гелиция"],
-                "price": 150,
-                "currency": "AZN",
-                "description": "Экзотический букет с редкими цветами из тропиков для ценителей прекрасного.",
-                "delivery_time": "Предзаказ за день",
-                "photo": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500&h=500&fit=crop",
-                "shop": "Flora.az",
-                "shop_url": "https://flora.az/exotic"
-            },
-            {
-                "id": "10",
-                "title": "Букет сухоцветов",
-                "category": "Долговечные",
-                "composition": ["панампа", "лагур", "целозия", "амаранус"],
-                "price": 55,
-                "currency": "AZN",
-                "description": "Красивый букет из сухоцветов - прослужит вам долгие месяцы.",
-                "delivery_time": "Готово сейчас",
-                "photo": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop",
-                "shop": "Bukety.az",
-                "shop_url": "https://bukety.az/dried-flowers"
-            }
-        ]
-        
-        self.flowers = bouquets
-        return bouquets
-    
-    def save_to_json(self):
-        """Save scraped flowers to JSON file"""
-        output_file = self.base_dir / "az_offers.json"
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(self.flowers, f, ensure_ascii=False, indent=2)
-        
-        print(f"\n[OK] Saved {len(self.flowers)} bouquets to {output_file}")
-        return output_file
-    
-    def generate_price_analysis(self):
-        """Generate price analysis for Azerbaijan market"""
-        
-        if not self.flowers:
-            return None
-        
-        prices = [f['price'] for f in self.flowers]
-        
-        analysis = {
-            "location": "Azerbaijan (Baku)",
-            "currency": "AZN",
-            "total_bouquets": len(self.flowers),
-            "average_price": round(sum(prices) / len(prices), 2),
-            "min_price": min(prices),
-            "max_price": max(prices),
-            "price_range": f"{min(prices)} — {max(prices)} AZN",
-            "popular_flowers": ["rosa", "hipsofila", "gerbera", "lale", "tulip"],
-            "delivery_services": [
-                "Flora.az",
-                "Gulzada",
-                "Bukety.az",
-                "Çiçek Evi"
-            ],
-            "avg_delivery_time": "2-3 saatlik",
-            "last_updated": datetime.now().isoformat()
-        }
-        
-        return analysis
-    
-    def run(self):
-        """Main execution"""
-        print("=" * 60)
-        print("[INFO] AZERBAIJANI FLOWER SHOP SCRAPER")
-        print("=" * 60)
-        
-        # Add manual bouquets (with real Azerbaijani prices in AZN)
-        self.add_manual_bouquets()
-        
-        # Save to JSON
-        self.save_to_json()
-        
-        # Generate analysis
-        analysis = self.generate_price_analysis()
-        
-        if analysis:
-            analysis_file = self.base_dir / "az_analysis.json"
-            with open(analysis_file, 'w', encoding='utf-8') as f:
-                json.dump(analysis, f, ensure_ascii=False, indent=2)
-            print(f"[OK] Saved analysis to {analysis_file}\n")
-            
-            print("[INFO] PRICE ANALYSIS (Azerbaijan Market):")
-            print(f"  - Total bouquets: {analysis['total_bouquets']}")
-            print(f"  - Average price: {analysis['average_price']} AZN")
-            print(f"  - Price range: {analysis['price_range']}")
-            print(f"  - Avg delivery: {analysis['avg_delivery_time']}")
-        
-        return self.flowers, analysis
+BASE_DIR   = Path(__file__).parent
+DATA_FILE  = BASE_DIR / "data" / "az_offers.json"
+LOG_FILE   = BASE_DIR / "data" / "scraper.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILE, encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
+)
+log = logging.getLogger("scraper")
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+}
+
+STOCK_DOMAINS = (
+    "pexels.com", "unsplash.com", "pixabay.com",
+    "shutterstock.com", "gettyimages.com",
+)
+
+# Pages to scrape on buket.az
+SCRAPE_PAGES = [
+    "https://buket.az/en/bouquets-order",
+    "https://buket.az/en/bouquets-tulips-order",
+    "https://buket.az/en/cheap-flowers",
+    "https://buket.az/en/101-roses-baku-azerbaijan",
+    "https://buket.az/en",
+    # Sweet bouquets
+    "https://buket.az/en/sweet-bouquet",
+    "https://buket.az/en/zefir-buket",
+    # Food / fruit bouquets
+    "https://buket.az/en/fruit-bouquet",
+    # Alcohol bouquets for men
+    "https://buket.az/en/bouquet-for-men",
+    "https://buket.az/en/alcohol-bouquet",
+]
+
+# Occasion keywords for auto-classification
+OCCASION_MAP = {
+    "romance":     ["rose", "роза", "romantic", "love", "date", "свидан", "love"],
+    "birthday":    ["birthday", "день рождения", "праздн", "gerbera", "sunflower", "подсолнух", "яркий"],
+    "wedding":     ["wed", "свадьб", "bride", "невест", "bridal", "белый", "white"],
+    "anniversary": ["юбил", "anniversary", "101", "51", "grand", "luxury", "premium"],
+    "corporate":   ["corporate", "корпорат", "business", "деловой", "eustoma", "алберт", "alstroemeria"],
+    "graduation":  ["graduation", "выпускн", "school", "tulip", "тюльпан"],
+    "just_because":["field", "полевой", "mix", "casual", "simple", "simple", "small", "kraft"],
+}
+
+FOR_WHOM_MAP = {
+    "girlfriend": ["rose", "роза", "pink", "romantic", "love", "peony", "пион"],
+    "wife":       ["rose", "роза", "lily", "hydrangea", "premium", "пион", "гортензия"],
+    "mom":        ["lily", "лилия", "eustoma", "sunflower", "подсолнух", "alstroemeria"],
+    "friend":     ["gerbera", "field", "полев", "tulip", "тюльпан", "colorful", "mixed"],
+    "colleague":  ["eustoma", "lily", "alstroemeria", "corporate", "white", "elegant"],
+    "teacher":    ["lily", "eustoma", "alstroemeria", "mixed", "field"],
+    "child":      ["gerbera", "sunflower", "field", "colorful", "tulip", "bright"],
+    "man":        ["tropical", "anthurium", "exotic", "sunflower"],
+}
+
+COLOR_MAP = {
+    "red":    ["red", "красн", "alaya", "crimson", "scarlet"],
+    "pink":   ["pink", "розов"],
+    "white":  ["white", "белый", "белая"],
+    "yellow": ["yellow", "жёлт", "зелен", "sunflower", "подсолнух"],
+    "purple": ["purple", "violet", "фиолет", "лавандов", "eustoma"],
+    "mixed":  ["mix", "mixed", "colorful", "multicolor", "разноцвет"],
+}
+
+TYPE_KEYWORDS = {
+    "food":   ["фрукт", "клубника", "ягода", "fruit", "strawberry",
+               "фруктовый", "ягодный", "berry", "exotic fruit"],
+    "alcohol":["виски", "вино", "коньяк", "пиво", "шампанское", "для него",
+               "whiskey", "wine", "beer", "cognac", "champagne", "alcohol"],
+    "sweets": ["зефир", "маршмеллоу", "сладкий", "конфеты", "шоколад",
+               "marshmallow", "candy", "sweet", "chocolate", "зефирный"],
+}
+
+def classify_type(title: str, composition: list) -> str:
+    text = (title + " " + " ".join(composition)).lower()
+    for type_key, keywords in TYPE_KEYWORDS.items():
+        if any(kw in text for kw in keywords):
+            return type_key
+    return "flowers"
+
+# Magical Russian descriptions by composition keyword
+DESCRIPTION_TEMPLATES = {
+    "пион": [
+        "Пышные, как мечта, пионы в полном цвету — это не просто букет, это поэма. Их нежный аромат окутает комнату шёлком утреннего сада.",
+        "Каждый пион — это целый мир нежности, завёрнутый в лепестки. Такой букет помнят годами.",
+    ],
+    "подсолнух": [
+        "Солнечные великаны, пахнущие летом и счастьем — букет, который невозможно не полюбить с первого взгляда.",
+        "Подсолнухи несут тепло туда, куда бы ни попали. Один взгляд — и день сразу становится лучше.",
+    ],
+    "роза": [
+        "Розы — это язык, который понимает каждое сердце. Свежесрезанные, они хранят в себе всё, что слова выразить не могут.",
+        "Классика, которая никогда не устаревает: роза остаётся самым красноречивым признанием.",
+    ],
+    "тюльпан": [
+        "Тюльпаны — первый знак весны и надежды. Нежные, прямые, честные — как настоящие чувства.",
+        "В каждом тюльпане — обещание нового начала. Подарите весну, даже если за окном другое время года.",
+    ],
+    "гортензия": [
+        "Воздушные шары гортензий — как кусочек неба, пойманный в букет. Роскошный выбор для особенных людей.",
+        "Гортензии похожи на облака, которые сошли на землю специально, чтобы стать частью вашего праздника.",
+    ],
+    "лилия": [
+        "Белоснежные лилии с королевской осанкой — благородный выбор для тех, кто ценит безупречный вкус.",
+        "Лилия говорит: я уважаю тебя и ценю каждый момент рядом с тобой.",
+    ],
+    "альстромерия": [
+        "Альстромерии — цветы инков, несущие послание дружбы. Яркие и стойкие — как настоящая дружба.",
+        "Пёстрые лепестки альстромерии расскажут о радости без слов.",
+    ],
+    "эустома": [
+        "Эустома — это когда природа нарисовала розу из мечты. Нежные лепестки создают букет, выглядящий вдвое дороже.",
+        "Лизиантус — цветок с характером: нежный снаружи и стойкий внутри, прямо как вы.",
+    ],
+    "гербера": [
+        "Разноцветные герберы — как набор красок для тех, кто рисует жизнь в ярких тонах. Стильно и абсолютно в точку.",
+        "Яркие, открытые, честные — герберы не умеют притворяться. Они просто радуются жизни.",
+    ],
+    "ромашка": [
+        "Букет, который пахнет детством, свободой и солнечным лугом. Полевые цветы — самые искренние.",
+        "Ромашки не притворяются — они просто существуют, и этого достаточно.",
+    ],
+    "полевые": [
+        "Букет, который пахнет летним лугом и свободой. Для тех, кто ценит простоту и искренность.",
+        "Полевые цветы как первое признание — немного робкое, очень честное и невероятно трогательное.",
+    ],
+    "хризантема": [
+        "Хризантемы — символ долголетия и мудрости, оформленные в роскошный букет.",
+        "Пышные хризантемы создают объём и ощущение праздника одним своим присутствием.",
+    ],
+    "default": [
+        "Свежий букет, собранный с любовью — лучший способ сказать что-то важное без слов.",
+        "Этот букет создан для тех особых моментов, которые хочется помнить вечно.",
+        "Красота, собранная в одном месте — ради одного особенного человека.",
+    ],
+}
+
+
+def make_offer_id(title: str, price: int) -> str:
+    raw = f"{title.lower()}{price}"
+    return "sc" + hashlib.md5(raw.encode()).hexdigest()[:8]
+
+
+def is_stock_photo(url: str) -> bool:
+    if not url:
+        return True
+    return any(d in url for d in STOCK_DOMAINS)
+
+
+def classify_occasions(title: str, composition: list[str]) -> list[str]:
+    text = (title + " " + " ".join(composition)).lower()
+    found = []
+    for occ, keywords in OCCASION_MAP.items():
+        if any(kw in text for kw in keywords):
+            found.append(occ)
+    if not found:
+        found = ["just_because", "birthday"]
+    return list(dict.fromkeys(found))  # dedupe preserving order
+
+
+def classify_for_whom(title: str, composition: list[str]) -> list[str]:
+    text = (title + " " + " ".join(composition)).lower()
+    found = []
+    for person, keywords in FOR_WHOM_MAP.items():
+        if any(kw in text for kw in keywords):
+            found.append(person)
+    if not found:
+        found = ["friend", "mom", "girlfriend"]
+    return found
+
+
+def classify_colors(title: str, composition: list[str]) -> list[str]:
+    text = (title + " " + " ".join(composition)).lower()
+    found = []
+    for color, keywords in COLOR_MAP.items():
+        if any(kw in text for kw in keywords):
+            found.append(color)
+    if not found:
+        found = ["mixed"]
+    return found
+
+
+def generate_description(composition: list[str]) -> str:
+    comp_text = " ".join(composition).lower()
+    for keyword, templates in DESCRIPTION_TEMPLATES.items():
+        if keyword in comp_text:
+            import random
+            return random.choice(templates)
+    import random
+    return random.choice(DESCRIPTION_TEMPLATES["default"])
+
+
+def parse_buket_az_page(url: str) -> list[dict]:
+    """Parse a single buket.az catalog page and return offers."""
+    offers = []
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=12)
+        if resp.status_code != 200:
+            log.warning("Got %d from %s", resp.status_code, url)
+            return []
+        soup = BeautifulSoup(resp.content, "html.parser")
+
+        # buket.az product cards — try multiple selectors
+        cards = (
+            soup.select(".product-card") or
+            soup.select(".product-item") or
+            soup.select("article.product") or
+            soup.select("[class*='product']") or
+            soup.select(".card")
+        )
+
+        if not cards:
+            # Try to find images with prices nearby
+            imgs = soup.select("img[src*='/storage/']")
+            log.info("No cards found on %s, found %d storage images", url, len(imgs))
+            for img in imgs[:20]:
+                src = img.get("src", "")
+                if not src or is_stock_photo(src):
+                    continue
+                # Try to find price nearby
+                parent = img.find_parent(["div", "article", "li", "section"])
+                if not parent:
+                    continue
+                price_el = parent.find(string=lambda t: t and "₼" in str(t))
+                if not price_el:
+                    continue
+                price_str = "".join(c for c in str(price_el) if c.isdigit() or c == ".")
+                try:
+                    price = int(float(price_str))
+                except (ValueError, TypeError):
+                    continue
+                if price <= 0 or price > 5000:
+                    continue
+
+                title_el = parent.find(["h2", "h3", "h4", "a"])
+                title = title_el.get_text(strip=True) if title_el else "Букет"
+                if len(title) < 3:
+                    continue
+
+                comp_text = title.lower()
+                composition = [w for w in comp_text.split() if len(w) > 3][:3] or [title]
+
+                if not src.startswith("http"):
+                    src = "https://buket.az" + src
+
+                offers.append({
+                    "title": title,
+                    "price": price,
+                    "photo": src,
+                    "composition": composition,
+                })
+            return offers
+
+        for card in cards[:30]:
+            img = card.find("img")
+            if not img:
+                continue
+            src = img.get("src") or img.get("data-src") or ""
+            if not src or is_stock_photo(src):
+                continue
+            if not src.startswith("http"):
+                src = "https://buket.az" + src
+
+            # Price
+            price_el = card.find(class_=lambda c: c and "price" in c.lower())
+            price = 0
+            if price_el:
+                price_text = price_el.get_text()
+                digits = "".join(c for c in price_text if c.isdigit() or c == ".")
+                try:
+                    price = int(float(digits))
+                except (ValueError, TypeError):
+                    pass
+            if price <= 0:
+                continue
+
+            # Title
+            title_el = card.find(["h2", "h3", "h4"]) or card.find("a")
+            title = title_el.get_text(strip=True) if title_el else img.get("alt", "Букет")
+            if not title or len(title) < 2:
+                continue
+
+            composition = [w for w in title.lower().split() if len(w) > 3][:3] or [title]
+
+            offers.append({
+                "title": title,
+                "price": price,
+                "photo": src,
+                "composition": composition,
+            })
+
+    except requests.RequestException as e:
+        log.error("Request failed for %s: %s", url, e)
+    except Exception as e:
+        log.exception("Parse error for %s: %s", url, e)
+
+    return offers
+
+
+def enrich_offer(raw: dict) -> dict:
+    """Add metadata fields to a raw scraped offer."""
+    title = raw["title"]
+    composition = raw.get("composition", [title])
+    price = raw["price"]
+    photo = raw["photo"]
+
+    occasions = classify_occasions(title, composition)
+    for_whom = classify_for_whom(title, composition)
+    colors = classify_colors(title, composition)
+    description = generate_description(composition)
+    offer_type = classify_type(title, composition)
+
+    return {
+        "id": make_offer_id(title, price),
+        "type": offer_type,
+        "title": title,
+        "occasion": occasions,
+        "occasion_display": " / ".join(
+            {"romance": "Романтика", "birthday": "День рождения",
+             "wedding": "Свадьба", "anniversary": "Юбилей",
+             "graduation": "Выпускной", "corporate": "Корпоратив",
+             "just_because": "Просто так"}.get(o, o)
+            for o in occasions[:2]
+        ),
+        "category": "Свежее",
+        "composition": composition,
+        "price": price,
+        "currency": "AZN",
+        "description": description,
+        "delivery_time": "Доставка по Баку",
+        "photo": photo,
+        "shop": "Buket.az",
+        "shop_url": "https://buket.az",
+        "is_special": False,
+        "for_whom": for_whom,
+        "age_range": ["18-30", "30-50"],
+        "colors": colors,
+        "tags": [],
+        "scraped_at": datetime.utcnow().isoformat(),
+    }
+
+
+def load_existing() -> list[dict]:
+    if DATA_FILE.exists():
+        try:
+            with DATA_FILE.open("r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+
+def save_offers(offers: list[dict]) -> None:
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with DATA_FILE.open("w", encoding="utf-8") as f:
+        json.dump(offers, f, ensure_ascii=False, indent=2)
+
+
+def scrape_once() -> int:
+    """Run one full scrape cycle. Returns number of new offers added."""
+    log.info("=== Scrape cycle started ===")
+    existing = load_existing()
+    existing_ids = {o["id"] for o in existing}
+
+    # Preserve manually curated offers (those with curated descriptions)
+    curated = [o for o in existing if not o.get("scraped_at")]
+    curated_ids = {o["id"] for o in curated}
+
+    new_raw: list[dict] = []
+    for url in SCRAPE_PAGES:
+        log.info("Fetching: %s", url)
+        raw_offers = parse_buket_az_page(url)
+        log.info("  Found %d raw offers", len(raw_offers))
+        new_raw.extend(raw_offers)
+        time.sleep(2)  # polite rate limiting
+
+    # Dedupe by offer id
+    added = 0
+    enriched_map = {o["id"]: o for o in curated}
+
+    for raw in new_raw:
+        offer = enrich_offer(raw)
+        oid = offer["id"]
+        if oid not in curated_ids:
+            if oid not in enriched_map:
+                enriched_map[oid] = offer
+                added += 1
+            else:
+                # Update price if changed
+                if enriched_map[oid]["price"] != offer["price"]:
+                    enriched_map[oid]["price"] = offer["price"]
+                    enriched_map[oid]["scraped_at"] = offer["scraped_at"]
+
+    all_offers = list(enriched_map.values())
+    save_offers(all_offers)
+    log.info("=== Scrape done: %d total, %d new ===", len(all_offers), added)
+    return added
+
+
+def run_loop(interval_seconds: int = 300) -> None:
+    """Run scraper in an infinite loop."""
+    log.info("Auto-scraper started. Interval: %ds", interval_seconds)
+    while True:
+        try:
+            scrape_once()
+        except Exception as e:
+            log.exception("Scrape cycle failed: %s", e)
+        log.info("Next scrape in %d seconds...", interval_seconds)
+        time.sleep(interval_seconds)
+
 
 if __name__ == "__main__":
-    scraper = AzFlowerScraper()
-    flowers, analysis = scraper.run()
+    import sys
+    if "--once" in sys.argv:
+        added = scrape_once()
+        print(f"Done. Added {added} new offers.")
+    else:
+        run_loop(interval_seconds=300)  # 5 minutes
