@@ -1,36 +1,29 @@
 from pathlib import Path
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 
 from offers import load_offers, analyze_offers, find_offer
+from translations import get_t, TRANSLATIONS, DEFAULT_LANG
 import json
+import math
 import uuid
 import smtplib
 import os
+import requests
 from email.message import EmailMessage
 from datetime import datetime
-from flask import jsonify
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "data" / "az_offers.json"
 
+SHOP_COORDS = {
+    "Buket.az":  (40.3777, 49.8920),
+    "Flora.az":  (40.3808, 49.8513),
+    "Gul.az":    (40.3753, 49.8345),
+    "default":   (40.4093, 49.8671),
+}
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-prod")
-
-OCCASIONS = [
-    {"key": "all",        "label": "Все"},
-    {"key": "romance",    "label": "Свидание"},
-    {"key": "birthday",   "label": "День рождения"},
-    {"key": "wedding",    "label": "Свадьба"},
-    {"key": "graduation", "label": "Выпускной"},
-    {"key": "anniversary","label": "Юбилей"},
-    {"key": "corporate",  "label": "Корпоратив"},
-    {"key": "just_because","label": "Просто так"},
-]
-
-@app.context_processor
-def inject_now():
-    return {'now': datetime.now()}
-
 
 FLOWER_KEYWORDS = {
     'rose', 'roses', 'peony', 'peonies', 'tulip', 'tulips', 'lily', 'lilies',
@@ -47,7 +40,9 @@ FLOWER_KEYWORDS = {
     'садовая', 'полевые', 'цветы', 'цветок', 'сирень', 'астранция',
 }
 
-def is_flower_offer(offer):
+def is_valid_offer(offer):
+    if offer.get('type') in ('sweets', 'food', 'alcohol'):
+        return True
     text = ' '.join([
         offer.get('title', ''),
         offer.get('description', ''),
@@ -56,32 +51,90 @@ def is_flower_offer(offer):
     ]).lower()
     return any(kw in text for kw in FLOWER_KEYWORDS)
 
+def has_real_photo(offer):
+    """Only accept photos from real shop URLs, not stock photo sites."""
+    photo = offer.get('photo', '')
+    if not photo:
+        return False
+    stock_domains = ('pexels.com', 'unsplash.com', 'pixabay.com', 'shutterstock.com', 'gettyimages.com')
+    return not any(domain in photo for domain in stock_domains)
 
-_raw_offers = load_offers(DATA_FILE)
-offers = [o for o in _raw_offers if is_flower_offer(o)]
-analysis = analyze_offers(offers)
+def markup_price(price):
+    return int(math.ceil(round(price * 1.1, 10)))
+
+def get_lang():
+    return session.get('lang', DEFAULT_LANG)
+
+def get_occasions(t):
+    return [
+        {"key": "all",         "label": t['occ_all']},
+        {"key": "romance",     "label": t['occ_romance']},
+        {"key": "birthday",    "label": t['occ_birthday']},
+        {"key": "wedding",     "label": t['occ_wedding']},
+        {"key": "graduation",  "label": t['occ_graduation']},
+        {"key": "anniversary", "label": t['occ_anniversary']},
+        {"key": "corporate",   "label": t['occ_corporate']},
+        {"key": "just_because","label": t['occ_just_because']},
+    ]
+
+@app.context_processor
+def inject_globals():
+    lang = get_lang()
+    t = get_t(lang)
+    return {
+        'now': datetime.now(),
+        't': t,
+        'lang': lang,
+        'all_langs': [
+            {'code': 'ru', 'name': TRANSLATIONS['ru']['lang_name']},
+            {'code': 'en', 'name': TRANSLATIONS['en']['lang_name']},
+            {'code': 'az', 'name': TRANSLATIONS['az']['lang_name']},
+        ],
+    }
+
+
+@app.route("/set_lang/<lang>")
+def set_lang(lang):
+    if lang in TRANSLATIONS:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('index'))
 
 
 @app.route("/")
 def index():
-    fresh = [o for o in load_offers(DATA_FILE) if is_flower_offer(o)]
+    lang = get_lang()
+    t = get_t(lang)
+    occasions = get_occasions(t)
     selected = request.args.get("occasion", "all")
+
+    raw = load_offers(DATA_FILE)
+    # Only real flower offers with real photos
+    fresh = [o for o in raw if is_valid_offer(o) and has_real_photo(o)]
+
     if selected and selected != "all":
         filtered = [o for o in fresh if selected in o.get("occasion", [])]
     else:
         filtered = fresh
+
+    for o in filtered:
+        o['display_price'] = markup_price(o['price'])
+    for o in fresh:
+        o['display_price'] = markup_price(o['price'])
+
     return render_template(
         "index.html",
         offers=filtered,
         all_offers_json=json.dumps(fresh, ensure_ascii=False),
         analysis=analyze_offers(fresh),
-        occasions=OCCASIONS,
+        occasions=occasions,
         selected_occasion=selected,
     )
 
 
 @app.route("/recommend", methods=["POST"])
 def recommend():
+    lang = get_lang()
+    t = get_t(lang)
     data = request.get_json(force=True)
     occasion  = data.get("occasion", "")
     for_whom  = data.get("for_whom", "")
@@ -90,7 +143,16 @@ def recommend():
     flowers   = data.get("flowers", "")
     color     = data.get("color", "")
 
-    fresh = [o for o in load_offers(DATA_FILE) if is_flower_offer(o)]
+    raw = load_offers(DATA_FILE)
+    # Only real photos
+    fresh = [o for o in raw if is_valid_offer(o) and has_real_photo(o)]
+
+    # Hard filter by flower type — only show offers that actually contain the requested flower
+    if flowers and flowers != "any":
+        fresh = [
+            o for o in fresh
+            if any(flowers.lower() in comp.lower() for comp in o.get('composition', []))
+        ]
 
     def score(offer):
         s = 0
@@ -107,20 +169,20 @@ def recommend():
                 s += 10
         else:
             s -= 20
-        if flowers and flowers != "any":
-            comp = " ".join(offer.get("composition", [])).lower()
-            if flowers.lower() in comp:
-                s += 15
         if color and color in offer.get("colors", []):
             s += 10
         return s
 
     scored = sorted(fresh, key=score, reverse=True)
     top3 = scored[:3]
+
+    if not top3:
+        return jsonify([])
+
     return jsonify([{
         "id": o["id"],
         "title": o["title"],
-        "price": o["price"],
+        "price": markup_price(o["price"]),
         "photo": o.get("photo", ""),
         "shop": o.get("shop", ""),
         "description": o.get("description", ""),
@@ -131,11 +193,14 @@ def recommend():
 
 @app.route("/order/<offer_id>", methods=["GET", "POST"])
 def order(offer_id):
-    fresh = [o for o in load_offers(DATA_FILE) if is_flower_offer(o)]
+    raw = load_offers(DATA_FILE)
+    fresh = [o for o in raw if is_valid_offer(o) and has_real_photo(o)]
     offer = find_offer(fresh, offer_id)
     if offer is None:
         flash("Выбранное предложение не найдено.", "error")
         return redirect(url_for("index"))
+
+    offer['display_price'] = markup_price(offer['price'])
 
     if request.method == "POST":
         name     = request.form.get("name", "").strip()
@@ -147,6 +212,7 @@ def order(offer_id):
             flash("Пожалуйста, заполните все поля заказа.", "error")
             return render_template("order.html", offer=offer)
 
+        offer['display_price'] = markup_price(offer['price'])
         order_id   = str(uuid.uuid4())
         order_data = {
             "order_id": order_id,
@@ -165,6 +231,11 @@ def order(offer_id):
         return render_template("confirmation.html", order=order_data)
 
     return render_template("order.html", offer=offer)
+
+
+@app.route("/builder")
+def builder():
+    return render_template("builder.html")
 
 
 @app.route('/pay_sandbox', methods=['POST'])
@@ -189,10 +260,8 @@ def pay_sandbox():
 
     notif_file = BASE_DIR / 'data' / 'notifications.log'
     notif_file.parent.mkdir(parents=True, exist_ok=True)
-    notif_file.write_text(
-        f"{datetime.utcnow().isoformat()} ORDER_PAID {order_id} {payment_id}\n",
-        encoding='utf-8'
-    )
+    with open(notif_file, 'a', encoding='utf-8') as f:
+        f.write(f"{datetime.utcnow().isoformat()} ORDER_PAID {order_id} {payment_id}\n")
 
     smtp_host  = os.environ.get('SMTP_HOST')
     smtp_port  = int(os.environ.get('SMTP_PORT', '587')) if os.environ.get('SMTP_PORT') else None
@@ -215,6 +284,48 @@ def pay_sandbox():
             app.logger.exception('Failed to send notification email: %s', e)
 
     return jsonify(status='ok', order_id=order_id)
+
+
+@app.route('/calculate_delivery', methods=['POST'])
+def calculate_delivery():
+    data = request.get_json(force=True)
+    offer_id      = data.get('offer_id', '')
+    delivery_addr = data.get('delivery_address', '').strip()
+
+    if not delivery_addr:
+        return jsonify(error='no_address'), 400
+
+    raw   = load_offers(DATA_FILE)
+    offer = find_offer(raw, offer_id)
+    if not offer:
+        return jsonify(error='offer_not_found'), 404
+
+    shop       = offer.get('shop', 'default')
+    origin     = SHOP_COORDS.get(shop, SHOP_COORDS['default'])
+    origin_str = f"{origin[0]},{origin[1]}"
+    dest_str   = f"{delivery_addr}, Baku, Azerbaijan"
+
+    api_key = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+    if not api_key:
+        distance_km = 5.0
+    else:
+        try:
+            url = (
+                "https://maps.googleapis.com/maps/api/distancematrix/json"
+                f"?origins={origin_str}&destinations={dest_str}"
+                f"&mode=driving&key={api_key}"
+            )
+            resp = requests.get(url, timeout=8)
+            resp.raise_for_status()
+            result = resp.json()
+            meters = result['rows'][0]['elements'][0]['distance']['value']
+            distance_km = round(meters / 1000, 2)
+        except Exception as e:
+            app.logger.warning('Distance API error: %s', e)
+            distance_km = 5.0
+
+    delivery_cost = int(math.ceil(distance_km * 1.5))
+    return jsonify(distance_km=distance_km, delivery_cost=delivery_cost)
 
 
 @app.route('/confirmation_paid')
