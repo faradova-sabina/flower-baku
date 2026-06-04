@@ -350,6 +350,208 @@ document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu() })
 })()
 
+// ── GLOBAL FLOATING REALISTIC FLOWERS ───────────────────────
+;(function() {
+  const FLOWER_TYPES = [
+    // Rose — layered petals
+    (col) => `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="rg${Math.random().toString(36).slice(2)}" cx="50%" cy="60%">
+          <stop offset="0%" stop-color="${lighten(col,0.4)}"/>
+          <stop offset="100%" stop-color="${darken(col,0.2)}"/>
+        </radialGradient>
+      </defs>
+      ${[0,72,144,216,288].map(a => petalPath(50,50,a,38,28,col)).join('')}
+      ${[36,108,180,252,324].map(a => petalPath(50,50,a,28,20,lighten(col,0.15))).join('')}
+      ${[0,90,180,270].map(a => petalPath(50,50,a,18,12,darken(col,0.1))).join('')}
+      <circle cx="50" cy="50" r="7" fill="${darken(col,0.3)}"/>
+      <circle cx="50" cy="50" r="3.5" fill="${lighten(col,0.6)}" opacity="0.8"/>
+    </svg>`,
+    // Peony — fluffy
+    (col) => `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      ${[...Array(16)].map((_,i) => petalPath(50,50,i*22.5,36,14,i<8?col:lighten(col,0.2))).join('')}
+      ${[...Array(10)].map((_,i) => petalPath(50,50,i*36,24,10,lighten(col,0.3))).join('')}
+      ${[...Array(6)].map((_,i) => petalPath(50,50,i*60,14,7,lighten(col,0.5))).join('')}
+      <circle cx="50" cy="50" r="5" fill="${lighten(col,0.7)}"/>
+    </svg>`,
+    // Daisy — long thin petals
+    (col) => `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      ${[...Array(14)].map((_,i) => petalPath(50,50,i*(360/14),40,8,col)).join('')}
+      <circle cx="50" cy="50" r="12" fill="#f5cc30"/>
+      <circle cx="50" cy="50" r="7" fill="#e8a800"/>
+      ${[...Array(8)].map((_,i)=>`<circle cx="${50+Math.cos(i/8*Math.PI*2)*5}" cy="${50+Math.sin(i/8*Math.PI*2)*5}" r="1.5" fill="#c07000" opacity="0.7"/>`).join('')}
+    </svg>`,
+  ]
+
+  function petalPath(cx, cy, angleDeg, len, wid, color) {
+    const a = angleDeg * Math.PI / 180
+    const tipX = cx + Math.cos(a - Math.PI/2) * len
+    const tipY = cy + Math.sin(a - Math.PI/2) * len
+    const lx   = cx + Math.cos(a - Math.PI/2 - 0.7) * len * 0.65
+    const ly   = cy + Math.sin(a - Math.PI/2 - 0.7) * len * 0.65
+    const rx   = cx + Math.cos(a - Math.PI/2 + 0.7) * len * 0.65
+    const ry   = cy + Math.sin(a - Math.PI/2 + 0.7) * len * 0.65
+    const bl   = cx + Math.cos(a + Math.PI/2 - 0.4) * wid * 0.7
+    const bly  = cy + Math.sin(a + Math.PI/2 - 0.4) * wid * 0.7
+    const br   = cx + Math.cos(a + Math.PI/2 + 0.4) * (-wid * 0.7) + cx * 0 + (cx - bl + cx)
+    const bry  = bly
+    return `<path d="M${cx},${cy} C${lx},${ly} ${tipX-(tipX-cx)*0.1},${tipY-(tipY-cy)*0.1} ${tipX},${tipY} C${rx},${ry} ${cx+Math.cos(a+Math.PI/2)*wid*0.5},${cy+Math.sin(a+Math.PI/2)*wid*0.5} ${cx},${cy}Z" fill="${color}" opacity="0.92"/>`
+  }
+
+  function lighten(hex, amt) {
+    const n = parseInt(hex.replace('#',''), 16)
+    const r = Math.min(255, (n>>16) + Math.round(amt*255))
+    const g = Math.min(255, ((n>>8)&0xff) + Math.round(amt*255))
+    const b = Math.min(255, (n&0xff) + Math.round(amt*255))
+    return `rgb(${r},${g},${b})`
+  }
+  function darken(hex, amt) {
+    const n = parseInt(hex.replace('#',''), 16)
+    const r = Math.max(0, (n>>16) - Math.round(amt*255))
+    const g = Math.max(0, ((n>>8)&0xff) - Math.round(amt*255))
+    const b = Math.max(0, (n&0xff) - Math.round(amt*255))
+    return `rgb(${r},${g},${b})`
+  }
+
+  const COLORS = ['#e8175d','#f48fb1','#ff6d00','#ffb703','#9c27b0','#fff','#ce93d8']
+
+  function spawnGlobalFlower() {
+    const col  = COLORS[Math.floor(Math.random() * COLORS.length)]
+    const type = FLOWER_TYPES[Math.floor(Math.random() * FLOWER_TYPES.length)]
+    const size = 30 + Math.random() * 55
+    const dur  = 12 + Math.random() * 18
+    const del  = Math.random() * 6
+    const x    = 2 + Math.random() * 96
+
+    const el = document.createElement('div')
+    el.className = 'global-flower'
+    el.style.cssText = `
+      left:${x}%;
+      bottom:-${size + 20}px;
+      width:${size}px;
+      height:${size}px;
+      animation-duration:${dur}s;
+      animation-delay:${del}s;
+      opacity:0.18;
+    `
+    el.innerHTML = type(col)
+    document.getElementById('bloom-global-layer')?.appendChild(el)
+    setTimeout(() => el.remove(), (dur + del) * 1000 + 500)
+  }
+
+  const layer = document.getElementById('bloom-global-layer')
+  if (layer) {
+    for (let i = 0; i < 8; i++) spawnGlobalFlower()
+    setInterval(spawnGlobalFlower, 2800)
+  }
+})()
+
+// ── HERO REALISTIC BLOOMING FLOWERS ─────────────────────────
+;(function() {
+  const container = document.getElementById('hero-flowers')
+  if (!container) return
+
+  // Detailed SVG rose that "blooms" open on render
+  function makeDetailedRose(color, size) {
+    const id = 'rose' + Math.random().toString(36).slice(2)
+    return `<svg id="${id}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      <defs>
+        <radialGradient id="g${id}" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.95"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0.6"/>
+        </radialGradient>
+        <filter id="f${id}" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+      <!-- Outer petals -->
+      ${[0,60,120,180,240,300].map((a,i) => {
+        const rad = a * Math.PI/180
+        const px = 100 + Math.cos(rad) * 62, py = 100 + Math.sin(rad) * 62
+        return `<ellipse cx="${px}" cy="${py}" rx="28" ry="42"
+          transform="rotate(${a},${px},${py})"
+          fill="url(#g${id})" opacity="0.88"
+          style="transform-origin:${px}px ${py}px;
+                 animation:petal-bloom 4s ${i*0.15}s ease-in-out infinite alternate"/>`
+      }).join('')}
+      <!-- Mid petals -->
+      ${[30,90,150,210,270,330].map((a,i) => {
+        const rad = a * Math.PI/180
+        const px = 100 + Math.cos(rad) * 40, py = 100 + Math.sin(rad) * 40
+        return `<ellipse cx="${px}" cy="${py}" rx="20" ry="32"
+          transform="rotate(${a},${px},${py})"
+          fill="${color}" opacity="0.82"
+          style="transform-origin:${px}px ${py}px;
+                 animation:petal-bloom 4s ${0.9+i*0.12}s ease-in-out infinite alternate"/>`
+      }).join('')}
+      <!-- Inner petals -->
+      ${[0,72,144,216,288].map((a,i) => {
+        const rad = a * Math.PI/180
+        const px = 100 + Math.cos(rad) * 22, py = 100 + Math.sin(rad) * 22
+        return `<ellipse cx="${px}" cy="${py}" rx="13" ry="20"
+          transform="rotate(${a},${px},${py})"
+          fill="${color}" opacity="0.9"
+          style="transform-origin:${px}px ${py}px;
+                 animation:petal-bloom 4s ${1.6+i*0.1}s ease-in-out infinite alternate"/>`
+      }).join('')}
+      <circle cx="100" cy="100" r="14" fill="#ffdd44" filter="url(#f${id})" opacity="0.95"/>
+      <circle cx="100" cy="100" r="7" fill="#fff" opacity="0.85"/>
+    </svg>`
+  }
+
+  const HERO_FLOWERS = [
+    { color: '#e8175d', x: 8,  y: 20, size: 110, dur: 6,   del: 0 },
+    { color: '#f48fb1', x: 88, y: 15, size: 90,  dur: 7.5, del: 1.2 },
+    { color: '#fff',    x: 50, y: 72, size: 70,  dur: 5.5, del: 0.6 },
+    { color: '#ffb703', x: 18, y: 65, size: 80,  dur: 8,   del: 2 },
+    { color: '#ce93d8', x: 78, y: 58, size: 85,  dur: 6.5, del: 0.9 },
+    { color: '#e8175d', x: 92, y: 82, size: 60,  dur: 7,   del: 1.5 },
+    { color: '#f48fb1', x: 5,  y: 82, size: 65,  dur: 9,   del: 2.5 },
+  ]
+
+  HERO_FLOWERS.forEach(f => {
+    const div = document.createElement('div')
+    div.className = 'hero-flower-svg'
+    div.style.cssText = `
+      left:${f.x}%;
+      top:${f.y}%;
+      width:${f.size}px;
+      height:${f.size}px;
+      animation-duration:${f.dur}s;
+      animation-delay:${f.del}s;
+      opacity:0.35;
+    `
+    div.innerHTML = makeDetailedRose(f.color, f.size)
+    container.appendChild(div)
+  })
+})()
+
+// ── NO-OFFERS ANIMATED FLOWER ────────────────────────────────
+;(function() {
+  const wrap = document.getElementById('no-offers-flower')
+  if (!wrap) return
+
+  wrap.innerHTML = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:120px;overflow:visible">
+    <defs>
+      <style>
+        .no-p { transform-origin: 60px 60px; animation: no-petal-open 2.5s ease-out forwards; }
+        @keyframes no-petal-open {
+          from { transform: scaleY(0) rotate(var(--r)); }
+          to   { transform: scaleY(1) rotate(var(--r)); }
+        }
+      </style>
+    </defs>
+    ${[0,51.4,102.8,154.2,205.7,257.1,308.5].map((a,i)=>
+      `<ellipse class="no-p" cx="${60+Math.cos(a*Math.PI/180)*30}" cy="${60+Math.sin(a*Math.PI/180)*30}"
+       rx="14" ry="22" fill="#e8175d" opacity="0.75"
+       style="--r:${a}deg;animation-delay:${i*0.12}s"/>`
+    ).join('')}
+    <circle cx="60" cy="60" r="16" fill="#ffdd44" style="animation:center-pulse 2s 1s ease-in-out infinite"/>
+    <circle cx="60" cy="60" r="8" fill="#fff" opacity="0.9"/>
+  </svg>`
+})()
+
 // ── SCROLL SPY ───────────────────────────────────────────────
 ;(function () {
   const allNavLinks = document.querySelectorAll(
@@ -379,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ── OCCASION FILTER TABS ─────────────────────────────────────
 ;(function () {
-  const tabs  = document.querySelectorAll('.occasion-tab')
+  const tabs  = document.querySelectorAll('.occasion-card')
   const cards = document.querySelectorAll('#offers-grid .offer-card')
   if (!tabs.length) return
 
@@ -533,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <img class="quiz-result-img" src="${offer.photo || ''}" alt="${offer.title}" loading="lazy">
         <div class="quiz-result-body">
           <div class="quiz-result-name">${offer.title}</div>
-          <div class="quiz-result-shop">🏪 ${offer.shop || ''}</div>
+          <div class="quiz-result-delivery">⏱️ ${offer.delivery_time || ''}</div>
           <div class="quiz-result-price">${offer.price}₼</div>
           <div class="quiz-result-delivery">⏱️ ${offer.delivery_time || ''}</div>
         </div>
