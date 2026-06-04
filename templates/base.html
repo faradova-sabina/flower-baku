@@ -16,24 +16,37 @@
     <canvas id="petals-canvas"></canvas>
 
     <!-- WhatsApp FAB -->
-    <a class="fab-wa" href="https://wa.me/994501234567" title="WhatsApp">💬</a>
+    <a class="fab-wa" href="https://wa.me/994702011930" title="WhatsApp">💬</a>
 
     <!-- toast notification -->
     <div class="toast" id="toast">🌸 Заказ оформлен!</div>
 
+    <!-- Mobile nav overlay -->
+    <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+      <button class="nav-overlay-close" id="nav-overlay-close" aria-label="Закрыть меню">✕</button>
+      <a href="{{ url_for('index') }}#catalog" data-section="catalog">Каталог</a>
+      <a href="{{ url_for('index') }}#quiz" data-section="quiz">Подбор букета</a>
+      <a href="{{ url_for('index') }}#delivery" data-section="delivery">Доставка</a>
+      <a href="#contact" data-section="contact">Контакт</a>
+      <a href="tel:+994702011930" class="nav-overlay-cta">📞 +994 70 201-19-30</a>
+    </div>
+
     <header class="site-header">
-      <div class="header-inner">
+      <div class="header-inner" id="header-inner">
         <a class="logo" href="{{ url_for('index') }}">
           <span class="logo-bloom">🌸</span>
           <span class="brand">Dream<span class="brand-accent">Bouquet</span></span>
         </a>
-        <nav class="nav">
-          <a href="{{ url_for('index') }}#catalog">Каталог</a>
-          <a href="{{ url_for('index') }}#quiz">Подбор букета</a>
-          <a href="#delivery">Доставка</a>
-          <a href="#contact">Контакт</a>
-          <a href="tel:+994501234567" class="nav-cta">📞 +994 50 123-45-67</a>
+        <nav class="nav" role="navigation" aria-label="Основная навигация">
+          <a href="{{ url_for('index') }}#catalog" data-section="catalog">Каталог</a>
+          <a href="{{ url_for('index') }}#quiz" data-section="quiz">Подбор букета</a>
+          <a href="{{ url_for('index') }}#delivery" data-section="delivery">Доставка</a>
+          <a href="#contact" data-section="contact">Контакт</a>
+          <a href="tel:+994702011930" class="nav-cta">📞 +994 70 201-19-30</a>
         </nav>
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Открыть меню" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
 
       {% block hero %}
@@ -83,8 +96,9 @@
       <div class="footer-inner">
         <div class="footer-brand">Dream<span class="footer-brand-accent">Bouquet</span></div>
         <div class="footer-links">
-          <a href="tel:+994501234567">📞 +994 50 123-45-67</a>
-          <a href="https://wa.me/994501234567">💬 WhatsApp</a>
+          <a href="tel:+994702011930">📞 +994 70 201-19-30</a>
+          <a href="https://wa.me/994702011930">💬 WhatsApp</a>
+          <a href="mailto:faradova@gmail.com">✉️ faradova@gmail.com</a>
           <a href="#">📸 Instagram</a>
           <a href="#">📍 ул. Низами 12, Баку</a>
         </div>

@@ -44,10 +44,19 @@ a { text-decoration: none; }
   align-items: center;
   justify-content: space-between;
   padding: 14px 40px;
-  background: rgba(26,10,20,.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(232,23,93,.25);
+  background: rgba(26,10,20,.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(232,23,93,.18);
+  transition: padding .35s ease, background .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+
+/* Compact & solid after scroll */
+.header-inner.scrolled {
+  padding: 10px 40px;
+  background: rgba(26,10,20,.97);
+  box-shadow: 0 4px 32px rgba(0,0,0,.45);
+  border-bottom-color: rgba(232,23,93,.35);
 }
 
 .logo { display: flex; align-items: center; gap: 10px; }
@@ -100,6 +109,117 @@ a { text-decoration: none; }
 .nav-cta:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 26px rgba(232,23,93,.6) !important;
+}
+
+/* Active nav link (scroll spy) */
+.nav a.nav-active {
+  color: #fff !important;
+}
+.nav a.nav-active::after {
+  width: 100% !important;
+}
+
+/* ─── HAMBURGER BUTTON ─── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+  background: none;
+  border: none;
+  z-index: 210;
+  position: relative;
+}
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform .3s ease, opacity .3s ease;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ─── MOBILE OVERLAY NAV ─── */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 195;
+  background: rgba(15,5,12,.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.nav-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.nav-overlay a {
+  color: rgba(255,255,255,.7);
+  font-size: 28px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 16px 0;
+  letter-spacing: .5px;
+  transition: color .2s, transform .2s;
+  position: relative;
+}
+.nav-overlay a::after {
+  content: '';
+  position: absolute;
+  bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: var(--rose);
+  transition: width .3s;
+}
+.nav-overlay a:hover {
+  color: #fff;
+  transform: translateX(6px);
+}
+.nav-overlay a:hover::after { width: 40px; }
+.nav-overlay a.nav-active { color: #fff; }
+.nav-overlay-cta {
+  margin-top: 24px;
+  background: linear-gradient(135deg, var(--rose), var(--deep));
+  color: #fff !important;
+  padding: 14px 36px !important;
+  border-radius: 50px;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 16px !important;
+  box-shadow: 0 6px 24px rgba(232,23,93,.5);
+}
+.nav-overlay-close {
+  position: absolute;
+  top: 20px; right: 24px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.5);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color .2s, transform .2s;
+}
+.nav-overlay-close:hover {
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* ─── SCROLL MARGIN (prevents content hiding behind fixed header) ─── */
+#quiz, #catalog, #catalog-grid, #delivery, #contact {
+  scroll-margin-top: 80px;
 }
 
 /* ─── HERO ─── */
@@ -1006,7 +1126,9 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 900px) { .order-card { grid-template-columns: 1fr; } }
 @media (max-width: 768px) {
   .header-inner { padding: 12px 20px; }
+  .header-inner.scrolled { padding: 8px 20px; }
   .nav { display: none; }
+  .nav-hamburger { display: flex; }
   .stats-bar { gap: 28px; padding: 24px 20px; }
   .quiz-card { padding: 32px 24px 28px; }
   .quiz-question { font-size: 20px; }

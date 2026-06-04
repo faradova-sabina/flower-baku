@@ -311,6 +311,72 @@ document.addEventListener('DOMContentLoaded', function () {
   })
 })
 
+// ── STICKY HEADER SCROLL EFFECT ─────────────────────────────
+;(function () {
+  const header = document.getElementById('header-inner')
+  if (!header) return
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 60)
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onScroll()  // run once in case page is loaded mid-scroll
+})()
+
+// ── MOBILE HAMBURGER MENU ────────────────────────────────────
+;(function () {
+  const btn     = document.getElementById('nav-hamburger')
+  const overlay = document.getElementById('nav-overlay')
+  const closeBtn= document.getElementById('nav-overlay-close')
+  if (!btn || !overlay) return
+
+  function openMenu() {
+    overlay.classList.add('open')
+    btn.classList.add('open')
+    btn.setAttribute('aria-expanded', 'true')
+    overlay.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+  }
+  function closeMenu() {
+    overlay.classList.remove('open')
+    btn.classList.remove('open')
+    btn.setAttribute('aria-expanded', 'false')
+    overlay.setAttribute('aria-hidden', 'true')
+    document.body.style.overflow = ''
+  }
+
+  btn.addEventListener('click', () => overlay.classList.contains('open') ? closeMenu() : openMenu())
+  closeBtn?.addEventListener('click', closeMenu)
+
+  // Close on link click or Escape
+  overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu))
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu() })
+})()
+
+// ── SCROLL SPY ───────────────────────────────────────────────
+;(function () {
+  const allNavLinks = document.querySelectorAll(
+    '.nav a[data-section], .nav-overlay a[data-section]'
+  )
+  if (!allNavLinks.length) return
+
+  const sectionIds = [...new Set([...allNavLinks].map(a => a.dataset.section))]
+
+  function setActive(id) {
+    allNavLinks.forEach(a => {
+      a.classList.toggle('nav-active', a.dataset.section === id)
+    })
+  }
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) setActive(e.target.id)
+    })
+  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 })
+
+  sectionIds.forEach(id => {
+    const el = document.getElementById(id)
+    if (el) obs.observe(el)
+  })
+})()
+
 // ── OCCASION FILTER TABS ─────────────────────────────────────
 ;(function () {
   const tabs  = document.querySelectorAll('.occasion-tab')
