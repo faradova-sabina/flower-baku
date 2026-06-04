@@ -138,8 +138,36 @@
 <div class="hand-overlay" id="hand-overlay">
   <div class="hand-overlay-bg" id="hand-overlay-bg"></div>
   <div class="hand-scene" id="hand-scene">
-    <div class="hand-message" id="hand-message">🌹 Ваш букет готов!</div>
-    <canvas id="hand-bouquet-canvas" class="hand-bouquet-canvas" width="500" height="600"></canvas>
+    <canvas id="hand-bouquet-canvas" class="hand-bouquet-canvas" width="500" height="500"></canvas>
+    <div class="hand-wrapper" id="hand-wrapper">
+      <svg id="hand-svg" class="hand-svg hand-open"
+        viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"
+        style="width:200px;height:320px;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.4))">
+        <defs>
+          <radialGradient id="skin-grad" cx="40%" cy="30%">
+            <stop offset="0%" stop-color="#FDDBB4"/>
+            <stop offset="100%" stop-color="#E8A87C"/>
+          </radialGradient>
+        </defs>
+        <rect x="55" y="260" width="90" height="60" rx="20" fill="url(#skin-grad)"/>
+        <path d="M55,280 Q50,200 60,160 Q80,120 100,115 Q120,120 140,160 Q150,200 145,280 Z"
+          fill="url(#skin-grad)"/>
+        <path class="finger f-index" d="M75,165 Q72,140 74,110 Q76,90 82,85 Q88,90 88,110 Q88,140 85,165 Z"
+          fill="url(#skin-grad)"/>
+        <path class="finger f-middle" d="M90,160 Q89,130 91,98 Q93,78 100,74 Q107,78 109,98 Q111,130 110,160 Z"
+          fill="url(#skin-grad)"/>
+        <path class="finger f-ring" d="M113,163 Q113,135 115,108 Q117,90 123,87 Q129,90 130,108 Q131,135 130,163 Z"
+          fill="url(#skin-grad)"/>
+        <path class="finger f-pinky" d="M132,170 Q133,148 135,128 Q137,114 141,113 Q145,114 146,128 Q147,148 145,170 Z"
+          fill="url(#skin-grad)"/>
+        <path class="finger f-thumb" d="M55,210 Q35,205 28,190 Q24,175 32,168 Q42,162 55,175 Z"
+          fill="url(#skin-grad)"/>
+        <line x1="77" y1="162" x2="87" y2="162" stroke="#D4956A" stroke-width="1.5" opacity="0.5"/>
+        <line x1="92" y1="157" x2="108" y2="157" stroke="#D4956A" stroke-width="1.5" opacity="0.5"/>
+        <line x1="115" y1="160" x2="129" y2="160" stroke="#D4956A" stroke-width="1.5" opacity="0.5"/>
+        <line x1="100" y1="110" x2="100" y2="20" stroke="#2a7a35" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </div>
   </div>
 </div>
 {% endblock %}
