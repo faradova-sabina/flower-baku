@@ -1,0 +1,1018 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t.builder_title }} — DreamBouquet{% endblock %}
+
+{% block hero %}{% endblock %}
+{% block stats %}{% endblock %}
+
+{% block head %}
+<style>
+.site-header { padding-top: 0; }
+.builder-page { padding-top: 100px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="builder-page">
+
+  <div class="builder-header">
+    <span class="section-eyebrow">🌺 {{ t.nav_builder }}</span>
+    <h1>{{ t.builder_title | replace(t.builder_title.split()[0], '<em>' + t.builder_title.split()[0] + '</em>', 1) | safe }}</h1>
+    <p>{{ t.builder_subtitle }}</p>
+  </div>
+
+  <div class="builder-layout">
+
+    <!-- ── LEFT PANEL ── -->
+    <div class="builder-panel">
+
+      <!-- Flower type -->
+      <span class="builder-section-label">{{ t.builder_flowers_label }}</span>
+      <div class="flower-type-grid" id="flower-type-grid">
+        <button class="flower-type-btn selected" data-type="rose" data-price="4">
+          <span class="ftype-icon">🌹</span>
+          <span class="ftype-name">{{ t.builder_flower_rose }}</span>
+          <span class="ftype-price">4₼/шт</span>
+        </button>
+        <button class="flower-type-btn" data-type="peony" data-price="8">
+          <span class="ftype-icon">🌸</span>
+          <span class="ftype-name">{{ t.builder_flower_peony }}</span>
+          <span class="ftype-price">8₼/шт</span>
+        </button>
+        <button class="flower-type-btn" data-type="tulip" data-price="2">
+          <span class="ftype-icon">🌷</span>
+          <span class="ftype-name">{{ t.builder_flower_tulip }}</span>
+          <span class="ftype-price">2₼/шт</span>
+        </button>
+        <button class="flower-type-btn" data-type="chrysanthemum" data-price="3">
+          <span class="ftype-icon">💮</span>
+          <span class="ftype-name">{{ t.builder_flower_chrysanthemum }}</span>
+          <span class="ftype-price">3₼/шт</span>
+        </button>
+        <button class="flower-type-btn" data-type="lily" data-price="5">
+          <span class="ftype-icon">🌼</span>
+          <span class="ftype-name">{{ t.builder_flower_lily }}</span>
+          <span class="ftype-price">5₼/шт</span>
+        </button>
+        <button class="flower-type-btn" data-type="sunflower" data-price="3">
+          <span class="ftype-icon">🌻</span>
+          <span class="ftype-name">{{ t.builder_flower_sunflower }}</span>
+          <span class="ftype-price">3₼/шт</span>
+        </button>
+      </div>
+
+      <!-- Color palette -->
+      <span class="builder-section-label">Цвет</span>
+      <div class="color-palette" id="color-palette">
+        <button class="color-swatch active" data-color="#e8175d" data-name="{{ t.builder_color_red }}" style="background:#e8175d" title="{{ t.builder_color_red }}"></button>
+        <button class="color-swatch" data-color="#f48fb1" data-name="{{ t.builder_color_pink }}" style="background:#f48fb1" title="{{ t.builder_color_pink }}"></button>
+        <button class="color-swatch" data-color="#fff" data-name="{{ t.builder_color_white }}" style="background:#f5f0ec;border:2px solid #ddd" title="{{ t.builder_color_white }}"></button>
+        <button class="color-swatch" data-color="#ffd700" data-name="{{ t.builder_color_yellow }}" style="background:#ffd700" title="{{ t.builder_color_yellow }}"></button>
+        <button class="color-swatch" data-color="#9c27b0" data-name="{{ t.builder_color_purple }}" style="background:#9c27b0" title="{{ t.builder_color_purple }}"></button>
+        <button class="color-swatch" data-color="#7b0f38" data-name="{{ t.builder_color_burgundy }}" style="background:#7b0f38" title="{{ t.builder_color_burgundy }}"></button>
+        <button class="color-swatch" data-color="#ff6d00" data-name="{{ t.builder_color_orange }}" style="background:#ff6d00" title="{{ t.builder_color_orange }}"></button>
+      </div>
+
+      <!-- Quantity -->
+      <span class="builder-section-label">Количество</span>
+      <div class="qty-controls">
+        <button class="qty-btn" id="qty-minus">−</button>
+        <span class="qty-display" id="qty-display">1</span>
+        <button class="qty-btn" id="qty-plus">+</button>
+      </div>
+
+      <!-- Add button -->
+      <button class="add-flower-btn" id="add-flower-btn">+ Добавить в букет</button>
+
+      <!-- Bouquet composition list -->
+      <ul class="bouquet-list" id="bouquet-list"></ul>
+
+      <!-- Wrapping -->
+      <span class="builder-section-label">{{ t.builder_wrapping_label }}</span>
+      <div class="wrapping-grid" id="wrapping-grid">
+        <button class="wrap-btn selected" data-wrap="none" data-price="0">
+          <span class="wrap-icon">🎀</span>
+          <span class="wrap-name">{{ t.builder_wrap_none }}</span>
+          <span class="wrap-price">+0₼</span>
+        </button>
+        <button class="wrap-btn" data-wrap="kraft" data-price="15">
+          <span class="wrap-icon">📦</span>
+          <span class="wrap-name">{{ t.builder_wrap_kraft }}</span>
+          <span class="wrap-price">+15₼</span>
+        </button>
+        <button class="wrap-btn" data-wrap="velvet" data-price="25">
+          <span class="wrap-icon">✨</span>
+          <span class="wrap-name">{{ t.builder_wrap_velvet }}</span>
+          <span class="wrap-price">+25₼</span>
+        </button>
+        <button class="wrap-btn" data-wrap="film" data-price="20">
+          <span class="wrap-icon">💫</span>
+          <span class="wrap-name">{{ t.builder_wrap_film }}</span>
+          <span class="wrap-price">+20₼</span>
+        </button>
+      </div>
+
+      <!-- Price & Order -->
+      <div class="builder-price-row">
+        <span class="builder-total-label">{{ t.builder_total_label }}</span>
+        <span class="builder-total-price" id="builder-price">0<span>₼</span></span>
+      </div>
+      <button class="builder-order-btn" id="builder-order-btn">{{ t.builder_btn_order }}</button>
+      <button class="builder-reset-btn" id="builder-reset-btn">{{ t.builder_btn_reset }}</button>
+    </div>
+
+    <!-- ── 3D CANVAS ── -->
+    <div class="builder-canvas-wrap">
+      <canvas id="bouquet-canvas"></canvas>
+      <div class="canvas-hint">{{ t.builder_hint }}</div>
+      <div class="canvas-empty-msg" id="canvas-empty-msg">
+        <span class="empty-icon">🌺</span>
+        <span>{{ t.builder_empty }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── HAND PRESENTATION OVERLAY ── -->
+<div class="hand-overlay" id="hand-overlay">
+  <div class="hand-overlay-bg" id="hand-overlay-bg"></div>
+  <div class="hand-scene" id="hand-scene">
+    <div class="hand-message" id="hand-message">🌹 Ваш букет готов!</div>
+    <canvas id="hand-bouquet-canvas" class="hand-bouquet-canvas" width="500" height="600"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+const bouquetItems = [];  // [{type, color, colorName, qty, price}]
+let selectedType    = 'rose';
+let selectedColor   = '#e8175d';
+let selectedColorName = 'Красный';
+let selectedQty     = 1;
+let selectedWrap    = 'none';
+let wrapPrice       = 0;
+
+/* ══════════════════════════════════════════════
+   THREE.JS SETUP
+══════════════════════════════════════════════ */
+const canvas = document.getElementById('bouquet-canvas');
+const wrap   = canvas.closest('.builder-canvas-wrap');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.4;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0020);
+scene.fog = new THREE.FogExp2(0x0d0020, 0.04);
+
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+camera.position.set(0, 3, 9);
+camera.lookAt(0, 1, 0);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1.5, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 1.2;
+controls.minDistance = 4;
+controls.maxDistance = 18;
+controls.minPolarAngle = Math.PI * 0.1;
+controls.maxPolarAngle = Math.PI * 0.78;
+
+/* ── LIGHTS ── */
+const ambientLight = new THREE.AmbientLight(0xffeedd, 0.6);
+scene.add(ambientLight);
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+keyLight.position.set(4, 8, 5);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 30;
+keyLight.shadow.camera.left = -8;
+keyLight.shadow.camera.right = 8;
+keyLight.shadow.camera.top = 8;
+keyLight.shadow.camera.bottom = -8;
+keyLight.shadow.bias = -0.001;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0xe8b4d0, 0.8);
+fillLight.position.set(-5, 3, -3);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0x7040ff, 0.6);
+rimLight.position.set(0, 5, -8);
+scene.add(rimLight);
+
+// Warm uplight from below
+const upLight = new THREE.PointLight(0xff6060, 1.2, 12);
+upLight.position.set(0, -2, 0);
+scene.add(upLight);
+
+// Sparkle point lights
+const sparkles = [];
+for (let i = 0; i < 3; i++) {
+  const pl = new THREE.PointLight(0xffcc44, 0, 6);
+  pl.position.set(
+    Math.cos(i * Math.PI * 2 / 3) * 3,
+    2 + i,
+    Math.sin(i * Math.PI * 2 / 3) * 3
+  );
+  scene.add(pl);
+  sparkles.push(pl);
+}
+
+/* ── FLOOR (invisible, for shadows) ── */
+const floorGeo = new THREE.CircleGeometry(8, 48);
+const floorMat = new THREE.ShadowMaterial({ opacity: 0.35 });
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -4;
+floor.receiveShadow = true;
+scene.add(floor);
+
+/* ── PARTICLES ── */
+const particleCount = 120;
+const particleGeo = new THREE.BufferGeometry();
+const positions = new Float32Array(particleCount * 3);
+const particleSizes = new Float32Array(particleCount);
+for (let i = 0; i < particleCount; i++) {
+  positions[i * 3]     = (Math.random() - 0.5) * 20;
+  positions[i * 3 + 1] = Math.random() * 14 - 2;
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+  particleSizes[i] = Math.random() * 3 + 1;
+}
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+particleGeo.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
+const particleMat = new THREE.PointsMaterial({
+  color: 0xffb0d0,
+  size: 0.08,
+  sizeAttenuation: true,
+  transparent: true,
+  opacity: 0.7,
+});
+scene.add(new THREE.Points(particleGeo, particleMat));
+
+/* ══════════════════════════════════════════════
+   FLOWER GEOMETRY FACTORIES
+══════════════════════════════════════════════ */
+
+function makePetalShape(len = 1.0, wid = 0.38) {
+  const s = new THREE.Shape();
+  s.moveTo(0, 0);
+  s.bezierCurveTo( wid * 0.9, len * 0.18,  wid, len * 0.6,  0, len);
+  s.bezierCurveTo(-wid,       len * 0.6, -wid * 0.9, len * 0.18, 0, 0);
+  return s;
+}
+
+function extrudePetal(shape, depth = 0.04) {
+  return new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: depth * 0.5,
+    bevelSize: depth * 0.3,
+    bevelSegments: 3,
+  });
+}
+
+function petalMaterial(color, roughness = 0.45, transmission = 0.15) {
+  return new THREE.MeshPhysicalMaterial({
+    color,
+    roughness,
+    metalness: 0,
+    transmission,
+    thickness: 0.1,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.97,
+  });
+}
+
+/* ── ROSE ── */
+function createRoseHead(hexColor) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(hexColor);
+  const mat = petalMaterial(col, 0.4, 0.18);
+  const darkMat = petalMaterial(col.clone().multiplyScalar(0.7), 0.35, 0.12);
+
+  // Outer layer (5 petals, cupped open)
+  const outerShape = makePetalShape(1.1, 0.42);
+  const outerGeo = extrudePetal(outerShape, 0.05);
+  for (let i = 0; i < 5; i++) {
+    const p = new THREE.Mesh(outerGeo, mat);
+    p.rotation.y = (i / 5) * Math.PI * 2;
+    p.rotation.x = -(Math.PI / 2 - 0.55);
+    p.castShadow = true;
+    group.add(p);
+  }
+
+  // Middle layer (5 petals, more upright)
+  const midShape = makePetalShape(0.85, 0.32);
+  const midGeo = extrudePetal(midShape, 0.04);
+  for (let i = 0; i < 5; i++) {
+    const p = new THREE.Mesh(midGeo, mat);
+    p.rotation.y = (i / 5) * Math.PI * 2 + Math.PI / 5;
+    p.rotation.x = -(Math.PI / 2 - 0.3);
+    p.castShadow = true;
+    group.add(p);
+  }
+
+  // Inner layer (4 petals, tightly furled)
+  const innerShape = makePetalShape(0.55, 0.22);
+  const innerGeo = extrudePetal(innerShape, 0.03);
+  for (let i = 0; i < 4; i++) {
+    const p = new THREE.Mesh(innerGeo, darkMat);
+    p.rotation.y = (i / 4) * Math.PI * 2;
+    p.rotation.x = -(Math.PI / 2 - 0.1);
+    p.castShadow = true;
+    group.add(p);
+  }
+
+  // Center
+  const cGeo = new THREE.SphereGeometry(0.14, 10, 8);
+  const cMat = new THREE.MeshPhysicalMaterial({ color: col.clone().multiplyScalar(0.6), roughness: 0.3 });
+  group.add(new THREE.Mesh(cGeo, cMat));
+
+  return group;
+}
+
+/* ── PEONY ── */
+function createPeonyHead(hexColor) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(hexColor);
+  const mat = petalMaterial(col, 0.5, 0.2);
+
+  for (let layer = 0; layer < 4; layer++) {
+    const n = 6 + layer * 2;
+    const len = 0.7 + layer * 0.28;
+    const wid = 0.32 + layer * 0.06;
+    const tiltX = -(Math.PI / 2 - 0.1 - layer * 0.14);
+    const shape = makePetalShape(len, wid);
+    const geo = extrudePetal(shape, 0.035);
+    for (let i = 0; i < n; i++) {
+      const p = new THREE.Mesh(geo, mat);
+      p.rotation.y = (i / n) * Math.PI * 2 + (layer * 0.3);
+      p.rotation.x = tiltX;
+      p.castShadow = true;
+      group.add(p);
+    }
+  }
+
+  // Center sphere cluster
+  for (let i = 0; i < 8; i++) {
+    const sGeo = new THREE.SphereGeometry(0.06, 6, 5);
+    const sMat = new THREE.MeshPhysicalMaterial({ color: 0xffdd44, roughness: 0.6 });
+    const s = new THREE.Mesh(sGeo, sMat);
+    const a = (i / 8) * Math.PI * 2;
+    s.position.set(Math.cos(a) * 0.12, 0, Math.sin(a) * 0.12);
+    group.add(s);
+  }
+
+  return group;
+}
+
+/* ── TULIP ── */
+function createTulipHead(hexColor) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(hexColor);
+  const mat = petalMaterial(col, 0.38, 0.22);
+
+  // Tulip: 3 outer + 3 inner petals, forming a cup shape
+  const outerShape = new THREE.Shape();
+  outerShape.moveTo(0, 0);
+  outerShape.bezierCurveTo(0.4, 0.1, 0.45, 0.8, 0.1, 1.4);
+  outerShape.bezierCurveTo(0, 1.5, -0.1, 1.4, -0.1, 1.4);
+  outerShape.bezierCurveTo(-0.45, 0.8, -0.4, 0.1, 0, 0);
+
+  const innerShape = new THREE.Shape();
+  innerShape.moveTo(0, 0);
+  innerShape.bezierCurveTo(0.3, 0.05, 0.35, 0.7, 0.05, 1.3);
+  innerShape.bezierCurveTo(0, 1.4, -0.05, 1.3, -0.05, 1.3);
+  innerShape.bezierCurveTo(-0.35, 0.7, -0.3, 0.05, 0, 0);
+
+  const outerGeo = extrudePetal(outerShape, 0.05);
+  const innerGeo = extrudePetal(innerShape, 0.04);
+  const innerMat = petalMaterial(col.clone().addScalar(0.08), 0.38, 0.25);
+
+  for (let i = 0; i < 3; i++) {
+    const p = new THREE.Mesh(outerGeo, mat);
+    p.rotation.y = (i / 3) * Math.PI * 2;
+    p.rotation.x = -(Math.PI / 2 - 0.75);
+    p.castShadow = true;
+    group.add(p);
+  }
+  for (let i = 0; i < 3; i++) {
+    const p = new THREE.Mesh(innerGeo, innerMat);
+    p.rotation.y = (i / 3) * Math.PI * 2 + Math.PI / 3;
+    p.rotation.x = -(Math.PI / 2 - 0.6);
+    p.castShadow = true;
+    group.add(p);
+  }
+
+  return group;
+}
+
+/* ── CHRYSANTHEMUM ── */
+function createChrysanthemumHead(hexColor) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(hexColor);
+
+  for (let layer = 0; layer < 5; layer++) {
+    const n = 10 + layer * 4;
+    const len = 0.45 + layer * 0.18;
+    const tiltX = -(Math.PI / 2 - layer * 0.18);
+    const mat = petalMaterial(col.clone().multiplyScalar(0.85 + layer * 0.04), 0.55, 0.1);
+    const shape = makePetalShape(len, 0.12);
+    const geo = extrudePetal(shape, 0.02);
+    for (let i = 0; i < n; i++) {
+      const p = new THREE.Mesh(geo, mat);
+      p.rotation.y = (i / n) * Math.PI * 2 + (layer * 0.2);
+      p.rotation.x = tiltX;
+      p.castShadow = true;
+      group.add(p);
+    }
+  }
+
+  const cGeo = new THREE.SphereGeometry(0.18, 10, 8);
+  const cMat = new THREE.MeshPhysicalMaterial({ color: 0xffee44, roughness: 0.5 });
+  group.add(new THREE.Mesh(cGeo, cMat));
+
+  return group;
+}
+
+/* ── LILY ── */
+function createLilyHead(hexColor) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(hexColor);
+  const mat = petalMaterial(col, 0.4, 0.2);
+
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0);
+  shape.bezierCurveTo(0.3, 0.2, 0.38, 0.7, 0, 1.5);
+  shape.bezierCurveTo(-0.38, 0.7, -0.3, 0.2, 0, 0);
+
+  const geo = extrudePetal(shape, 0.04);
+
+  for (let i = 0; i < 6; i++) {
+    const p = new THREE.Mesh(geo, mat);
+    p.rotation.y = (i / 6) * Math.PI * 2;
+    p.rotation.x = -(Math.PI / 2 - 0.5);
+    p.castShadow = true;
+    group.add(p);
+  }
+
+  // Stamens
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const stamenGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.9, 5);
+    const stamenMat = new THREE.MeshPhysicalMaterial({ color: 0x558833, roughness: 0.6 });
+    const stamen = new THREE.Mesh(stamenGeo, stamenMat);
+    stamen.position.set(Math.cos(a) * 0.2, 0.35, Math.sin(a) * 0.2);
+    stamen.rotation.z = -a * 0.3;
+    group.add(stamen);
+
+    const antherGeo = new THREE.SphereGeometry(0.04, 6, 5);
+    const antherMat = new THREE.MeshPhysicalMaterial({ color: 0x442200, roughness: 0.5 });
+    const anther = new THREE.Mesh(antherGeo, antherMat);
+    anther.position.set(Math.cos(a) * 0.22, 0.82, Math.sin(a) * 0.22);
+    group.add(anther);
+  }
+
+  return group;
+}
+
+/* ── SUNFLOWER ── */
+function createSunflowerHead(hexColor) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(hexColor);
+  const mat = petalMaterial(col, 0.55, 0.08);
+
+  const shape = makePetalShape(1.1, 0.28);
+  const geo = extrudePetal(shape, 0.03);
+
+  for (let i = 0; i < 18; i++) {
+    const p = new THREE.Mesh(geo, mat);
+    p.rotation.y = (i / 18) * Math.PI * 2;
+    p.rotation.x = -(Math.PI / 2 - 0.2);
+    p.castShadow = true;
+    group.add(p);
+  }
+
+  // Dark brown disk
+  const diskGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.18, 32);
+  const diskMat = new THREE.MeshPhysicalMaterial({ color: 0x2d1200, roughness: 0.9 });
+  const disk = new THREE.Mesh(diskGeo, diskMat);
+  disk.castShadow = true;
+  group.add(disk);
+
+  // Seed bumps
+  for (let i = 0; i < 32; i++) {
+    const a = (i / 32) * Math.PI * 2;
+    const r = 0.05 + (i % 4) * 0.1;
+    const bGeo = new THREE.SphereGeometry(0.03, 4, 3);
+    const bMat = new THREE.MeshPhysicalMaterial({ color: 0x1a0800, roughness: 0.95 });
+    const b = new THREE.Mesh(bGeo, bMat);
+    b.position.set(Math.cos(a) * r, 0.12, Math.sin(a) * r);
+    group.add(b);
+  }
+
+  return group;
+}
+
+/* ── STEM ── */
+function createStem(from, to) {
+  const dir = to.clone().sub(from);
+  const len = dir.length();
+  const mid = from.clone().add(to).multiplyScalar(0.5);
+
+  const stemGeo = new THREE.CylinderGeometry(0.028, 0.028, len, 6);
+  const stemMat = new THREE.MeshPhysicalMaterial({ color: 0x2a7a35, roughness: 0.75 });
+  const stem = new THREE.Mesh(stemGeo, stemMat);
+  stem.castShadow = true;
+  stem.position.copy(mid);
+  stem.quaternion.setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    dir.normalize()
+  );
+  return stem;
+}
+
+/* ── LEAF ── */
+function createLeaf(pos, angle) {
+  const leafShape = new THREE.Shape();
+  leafShape.moveTo(0, 0);
+  leafShape.bezierCurveTo(0.25, 0.1, 0.3, 0.55, 0, 0.8);
+  leafShape.bezierCurveTo(-0.3, 0.55, -0.25, 0.1, 0, 0);
+
+  const leafGeo = new THREE.ExtrudeGeometry(leafShape, { depth: 0.018, bevelEnabled: false });
+  const leafMat = new THREE.MeshPhysicalMaterial({ color: 0x1e6b28, roughness: 0.7, side: THREE.DoubleSide });
+  const leaf = new THREE.Mesh(leafGeo, leafMat);
+  leaf.castShadow = true;
+  leaf.position.copy(pos);
+  leaf.rotation.y = angle;
+  leaf.rotation.x = -Math.PI / 2 + 0.3;
+  return leaf;
+}
+
+/* ── WRAPPING CONE ── */
+function createWrappingMesh(style) {
+  const configs = {
+    none:   { color: null },
+    kraft:  { color: 0xc8a060, roughness: 0.9, metalness: 0 },
+    velvet: { color: 0x5d0f35, roughness: 0.1, metalness: 0.02 },
+    film:   { color: 0xd0eeff, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.45 },
+  };
+  const cfg = configs[style] || configs.none;
+  if (!cfg.color) return null;
+
+  const group = new THREE.Group();
+
+  const coneGeo = new THREE.ConeGeometry(1.05, 3.2, 14, 3, true);
+  const coneMat = new THREE.MeshPhysicalMaterial({
+    color: cfg.color,
+    roughness: cfg.roughness ?? 0.6,
+    metalness: cfg.metalness ?? 0,
+    transparent: cfg.transparent ?? false,
+    opacity: cfg.opacity ?? 1,
+    side: THREE.DoubleSide,
+  });
+  const cone = new THREE.Mesh(coneGeo, coneMat);
+  cone.position.y = -3;
+  cone.castShadow = true;
+  group.add(cone);
+
+  // Ribbon bow for velvet
+  if (style === 'velvet') {
+    const bowMat = new THREE.MeshPhysicalMaterial({ color: 0xffd700, roughness: 0.2 });
+    for (let i = 0; i < 2; i++) {
+      const bGeo = new THREE.TorusGeometry(0.22, 0.055, 6, 12, Math.PI);
+      const bow = new THREE.Mesh(bGeo, bowMat);
+      bow.position.y = -1.45;
+      bow.rotation.y = i * Math.PI;
+      bow.rotation.z = -0.4 + i * 0.8;
+      group.add(bow);
+    }
+  }
+
+  return group;
+}
+
+/* ══════════════════════════════════════════════
+   BOUQUET SCENE MANAGEMENT
+══════════════════════════════════════════════ */
+const bouquetGroup = new THREE.Group();
+scene.add(bouquetGroup);
+
+const FLOWER_FACTORIES = {
+  rose:          createRoseHead,
+  peony:         createPeonyHead,
+  tulip:         createTulipHead,
+  chrysanthemum: createChrysanthemumHead,
+  lily:          createLilyHead,
+  sunflower:     createSunflowerHead,
+};
+
+let wrappingMesh = null;
+const stemBase = new THREE.Vector3(0, -1.5, 0);
+
+function fibPoint(index, total, radius) {
+  const phi = Math.PI * (3 - Math.sqrt(5));
+  const y = 1 - (index / Math.max(total - 1, 1)) * 0.7;
+  const r = Math.sqrt(Math.max(0, 1 - y * y)) * radius;
+  const theta = phi * index;
+  return new THREE.Vector3(
+    Math.cos(theta) * r,
+    y * radius + 0.8,
+    Math.sin(theta) * r
+  );
+}
+
+function rebuildBouquet() {
+  // Clear existing
+  while (bouquetGroup.children.length) {
+    bouquetGroup.remove(bouquetGroup.children[0]);
+  }
+
+  // Flatten items into individual flowers
+  const flowers = [];
+  for (const item of bouquetItems) {
+    for (let i = 0; i < item.qty; i++) {
+      flowers.push({ type: item.type, color: item.color });
+    }
+  }
+
+  const n = flowers.length;
+  const emptyMsg = document.getElementById('canvas-empty-msg');
+  emptyMsg.style.display = n === 0 ? 'flex' : 'none';
+  if (n === 0) return;
+
+  const radius = Math.min(1.2 + n * 0.06, 2.2);
+
+  flowers.forEach((f, i) => {
+    const factory = FLOWER_FACTORIES[f.type] || createRoseHead;
+    const head = factory(f.color);
+    head.scale.setScalar(0.72 + Math.random() * 0.14);
+
+    const pos = fibPoint(i, n, radius);
+    pos.y += (Math.random() - 0.5) * 0.3;
+
+    head.position.copy(pos);
+    // Tilt flower head slightly outward
+    head.lookAt(pos.clone().add(new THREE.Vector3(
+      pos.x * 0.4,
+      pos.y * 0.15,
+      pos.z * 0.4
+    )));
+
+    head.rotation.x += Math.random() * 0.25 - 0.12;
+    head.rotation.z += Math.random() * 0.25 - 0.12;
+
+    bouquetGroup.add(head);
+
+    // Stem
+    const stemEnd = stemBase.clone().add(new THREE.Vector3(
+      pos.x * 0.18,
+      0,
+      pos.z * 0.18
+    ));
+    bouquetGroup.add(createStem(pos.clone().add(new THREE.Vector3(0, -0.2, 0)), stemEnd));
+
+    // Random leaf along stem
+    if (Math.random() > 0.45) {
+      const leafT = 0.3 + Math.random() * 0.4;
+      const leafPos = pos.clone().lerp(stemEnd, leafT);
+      bouquetGroup.add(createLeaf(leafPos, Math.random() * Math.PI * 2));
+    }
+  });
+
+  // Wrapping
+  if (wrappingMesh) bouquetGroup.remove(wrappingMesh);
+  const w = createWrappingMesh(selectedWrap);
+  if (w) {
+    bouquetGroup.add(w);
+    wrappingMesh = w;
+  } else {
+    wrappingMesh = null;
+  }
+
+  // Animate sparkle lights
+  sparkles.forEach((pl, i) => {
+    pl.color.set(flowers[i % flowers.length]?.color || 0xffcc44);
+    pl.intensity = 0.8 + Math.random() * 0.4;
+  });
+}
+
+/* ══════════════════════════════════════════════
+   RESIZE
+══════════════════════════════════════════════ */
+function resize() {
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+resize();
+new ResizeObserver(resize).observe(wrap);
+
+/* ══════════════════════════════════════════════
+   ANIMATION LOOP
+══════════════════════════════════════════════ */
+let t = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.016;
+
+  controls.update();
+
+  // Sparkle pulse
+  sparkles.forEach((pl, i) => {
+    pl.intensity = Math.max(0, 0.6 + 0.6 * Math.sin(t * 2.3 + i * 2.1));
+  });
+
+  // Gentle float of the whole bouquet
+  bouquetGroup.position.y = Math.sin(t * 0.7) * 0.06;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ══════════════════════════════════════════════
+   UI LOGIC
+══════════════════════════════════════════════ */
+
+// Flower type selection
+document.getElementById('flower-type-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.flower-type-btn');
+  if (!btn) return;
+  document.querySelectorAll('.flower-type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedType = btn.dataset.type;
+});
+
+// Color selection
+document.getElementById('color-palette').addEventListener('click', e => {
+  const sw = e.target.closest('.color-swatch');
+  if (!sw) return;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  sw.classList.add('active');
+  selectedColor = sw.dataset.color;
+  selectedColorName = sw.dataset.name;
+});
+
+// Quantity
+const qtyDisplay = document.getElementById('qty-display');
+document.getElementById('qty-minus').addEventListener('click', () => {
+  selectedQty = Math.max(1, selectedQty - 1);
+  qtyDisplay.textContent = selectedQty;
+});
+document.getElementById('qty-plus').addEventListener('click', () => {
+  selectedQty = Math.min(20, selectedQty + 1);
+  qtyDisplay.textContent = selectedQty;
+});
+
+// Add flower
+document.getElementById('add-flower-btn').addEventListener('click', () => {
+  const priceBtn = document.querySelector(`.flower-type-btn[data-type="${selectedType}"]`);
+  const pricePerStem = parseInt(priceBtn?.dataset.price || '4');
+  const existing = bouquetItems.find(i => i.type === selectedType && i.color === selectedColor);
+  if (existing) {
+    existing.qty = Math.min(30, existing.qty + selectedQty);
+  } else {
+    bouquetItems.push({
+      type: selectedType,
+      color: selectedColor,
+      colorName: selectedColorName,
+      qty: selectedQty,
+      price: pricePerStem,
+    });
+  }
+  renderList();
+  rebuildBouquet();
+  updatePrice();
+});
+
+// Wrapping
+document.getElementById('wrapping-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.wrap-btn');
+  if (!btn) return;
+  document.querySelectorAll('.wrap-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedWrap = btn.dataset.wrap;
+  wrapPrice = parseInt(btn.dataset.price);
+  rebuildBouquet();
+  updatePrice();
+});
+
+// Bouquet list
+function renderList() {
+  const list = document.getElementById('bouquet-list');
+  list.innerHTML = '';
+  bouquetItems.forEach((item, idx) => {
+    const li = document.createElement('li');
+    li.className = 'bouquet-list-item';
+    li.innerHTML = `
+      <div class="item-info">
+        <span class="item-dot" style="background:${item.color}"></span>
+        <span>${item.type} × ${item.qty}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--muted)">${item.qty * item.price}₼</span>
+        <button class="item-remove" data-idx="${idx}">×</button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+  list.querySelectorAll('.item-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bouquetItems.splice(parseInt(btn.dataset.idx), 1);
+      renderList();
+      rebuildBouquet();
+      updatePrice();
+    });
+  });
+}
+
+function updatePrice() {
+  const flowerTotal = bouquetItems.reduce((s, i) => s + i.qty * i.price, 0);
+  const total = Math.ceil((flowerTotal + wrapPrice) * 1.2);
+  document.getElementById('builder-price').innerHTML = `${total}<span>₼</span>`;
+}
+
+// Reset
+document.getElementById('builder-reset-btn').addEventListener('click', () => {
+  bouquetItems.length = 0;
+  renderList();
+  rebuildBouquet();
+  updatePrice();
+});
+
+// Order → Hand animation → WhatsApp
+document.getElementById('builder-order-btn').addEventListener('click', () => {
+  if (bouquetItems.length === 0) {
+    document.getElementById('builder-order-btn').style.animation = 'shake .35s ease';
+    setTimeout(() => document.getElementById('builder-order-btn').style.animation = '', 400);
+    return;
+  }
+  playHandAnimation();
+});
+
+/* ══════════════════════════════════════════════
+   HAND PRESENTATION ANIMATION
+══════════════════════════════════════════════ */
+function playHandAnimation() {
+  const overlay    = document.getElementById('hand-overlay');
+  const handScene  = document.getElementById('hand-scene');
+  const handCanvas = document.getElementById('hand-bouquet-canvas');
+
+  // Draw the bouquet snapshot onto the hand canvas
+  drawBouquetSnapshot(handCanvas);
+
+  overlay.classList.add('active');
+  overlay.style.display = 'flex';
+
+  // Reset animation
+  handScene.style.animation = 'none';
+  handScene.offsetHeight; // reflow
+  handScene.style.animation = 'hand-present 3.2s cubic-bezier(.22,1,.36,1) forwards';
+
+  const bg = document.getElementById('hand-overlay-bg');
+  bg.style.animation = 'none';
+  bg.offsetHeight;
+  bg.style.animation = 'overlay-bg-fade 3.2s ease forwards';
+
+  // After animation, redirect to WhatsApp
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.classList.remove('active');
+
+    const msg = buildWhatsAppMessage();
+    const url = `https://wa.me/994702011930?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  }, 3400);
+}
+
+function buildWhatsAppMessage() {
+  let lines = ['🌸 Заказ из конструктора букетов DreamBouquet:', ''];
+  bouquetItems.forEach(item => {
+    lines.push(`• ${item.type} (${item.colorName}) × ${item.qty} шт — ${item.qty * item.price}₼`);
+  });
+  if (selectedWrap !== 'none') {
+    const wrapLabel = document.querySelector(`.wrap-btn[data-wrap="${selectedWrap}"] .wrap-name`)?.textContent;
+    lines.push(`• Упаковка: ${wrapLabel} — ${wrapPrice}₼`);
+  }
+  lines.push('');
+  const total = Math.ceil((bouquetItems.reduce((s, i) => s + i.qty * i.price, 0) + wrapPrice) * 1.2);
+  lines.push(`💐 Итого: ${total}₼`);
+  lines.push('');
+  lines.push('Пожалуйста, укажите адрес доставки и удобное время.');
+  return lines.join('\n');
+}
+
+function drawBouquetSnapshot(canvas) {
+  // Capture current Three.js frame onto the hand canvas
+  renderer.render(scene, camera);
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Draw the Three.js frame (scaled)
+  ctx.drawImage(renderer.domElement, 0, 0, w, h * 0.62);
+
+  // Draw SVG hand below
+  drawHandSVG(ctx, w, h);
+}
+
+function drawHandSVG(ctx, w, h) {
+  // Draw a stylized hand holding the bouquet stem
+  const hy = h * 0.55;  // hand starts here
+
+  ctx.save();
+  ctx.fillStyle = '#f2c5a0';
+  ctx.strokeStyle = '#d4956a';
+  ctx.lineWidth = 2;
+
+  // Palm
+  ctx.beginPath();
+  ctx.ellipse(w * 0.5, hy + h * 0.22, w * 0.22, h * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Fingers (simplified)
+  const fingers = [
+    [w*0.28, hy + 0.02*h, w*0.055, h*0.14],
+    [w*0.36, hy - 0.04*h, w*0.055, h*0.16],
+    [w*0.5,  hy - 0.06*h, w*0.055, h*0.17],
+    [w*0.64, hy - 0.03*h, w*0.055, h*0.15],
+    [w*0.74, hy + 0.04*h, w*0.045, h*0.12],
+  ];
+
+  fingers.forEach(([x, y, rx, ry]) => {
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#f2c5a0';
+    ctx.fill();
+    ctx.strokeStyle = '#d4956a';
+    ctx.stroke();
+  });
+
+  // Stem held in hand
+  ctx.beginPath();
+  ctx.strokeStyle = '#2a7a35';
+  ctx.lineWidth = 6;
+  ctx.moveTo(w * 0.5, hy - 0.05 * h);
+  ctx.lineTo(w * 0.5, hy + 0.38 * h);
+  ctx.stroke();
+
+  // Glow around hand
+  const grd = ctx.createRadialGradient(w*0.5, hy+0.15*h, 10, w*0.5, hy+0.15*h, w*0.45);
+  grd.addColorStop(0, 'rgba(232,23,93,0.2)');
+  grd.addColorStop(1, 'rgba(232,23,93,0)');
+  ctx.beginPath();
+  ctx.arc(w*0.5, hy+0.15*h, w*0.45, 0, Math.PI*2);
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  ctx.restore();
+}
+
+// Add shake keyframe
+const style = document.createElement('style');
+style.textContent = `@keyframes shake {
+  0%,100% { transform:translateX(0); }
+  20% { transform:translateX(-6px); }
+  40% { transform:translateX(6px); }
+  60% { transform:translateX(-4px); }
+  80% { transform:translateX(4px); }
+}`;
+document.head.appendChild(style);
+
+// Initialize UI
+rebuildBouquet();
+updatePrice();
+renderList();
+</script>
+{% endblock %}
