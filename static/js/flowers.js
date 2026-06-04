@@ -211,3 +211,76 @@ function makeFlowerSVGByType(type, size) {
 
   container.querySelectorAll('.flower').forEach(el => observer.observe(el))
 })()
+
+// ── REALISTIC PETAL CANVAS ───────────────────────────────────
+;(function initRealisticPetals() {
+  const canvas = document.getElementById('petals-canvas')
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
+  resize()
+  window.addEventListener('resize', resize)
+
+  const PETAL_COLORS = [
+    ['#FF9BB5', '#FF6B8A'],
+    ['#FFFFFF', '#FFE0EC'],
+    ['#E8175D', '#FF4477'],
+    ['#D4B8F0', '#C4A7E7'],
+  ]
+
+  const MAX_PETALS = window.innerWidth > 768 ? 18 : 10
+
+  function createPetal(init) {
+    const color = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)]
+    return {
+      x:           Math.random() * canvas.width,
+      y:           init ? Math.random() * canvas.height : -20,
+      vx:          (Math.random() - 0.5) * 0.5,
+      vy:          1 + Math.random() * 1.5,
+      rotation:    Math.random() * Math.PI * 2,
+      rotSpeed:    (Math.random() - 0.5) * 0.04,
+      wobble:      Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.025 + Math.random() * 0.02,
+      wobbleAmp:   15 + Math.random() * 15,
+      opacity:     0.4 + Math.random() * 0.45,
+      size:        8 + Math.random() * 8,
+      color,
+    }
+  }
+
+  function drawPetal(p) {
+    ctx.save()
+    ctx.translate(p.x, p.y)
+    ctx.rotate(p.rotation)
+    ctx.globalAlpha = p.opacity
+    const grad = ctx.createLinearGradient(0, -p.size, 0, p.size * 0.3)
+    grad.addColorStop(0, p.color[0])
+    grad.addColorStop(1, p.color[1])
+    ctx.fillStyle = grad
+    const s = p.size
+    ctx.beginPath()
+    ctx.moveTo(0, -s)
+    ctx.bezierCurveTo( s * 0.7, -s * 0.6,  s * 0.9,  s * 0.1,  0,  s * 0.3)
+    ctx.bezierCurveTo(-s * 0.9,  s * 0.1, -s * 0.7, -s * 0.6,  0, -s)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+  }
+
+  function updatePetal(p) {
+    p.wobble   += p.wobbleSpeed
+    p.x        += p.vx + Math.sin(p.wobble) * 0.6
+    p.y        += p.vy
+    p.rotation += p.rotSpeed
+    if (p.y > canvas.height + 30) Object.assign(p, createPetal(false))
+  }
+
+  const petals = Array.from({ length: MAX_PETALS }, () => createPetal(true))
+
+  ;(function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    petals.forEach(p => { updatePetal(p); drawPetal(p) })
+    requestAnimationFrame(loop)
+  })()
+})()
