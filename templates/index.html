@@ -1,148 +1,149 @@
 {% extends 'base.html' %}
 
-{% block title %}Лучшие букеты в Баку — сравнение цен{% endblock %}
+{% block title %}DreamBouquet — {{ t.catalog_title | striptags }}{% endblock %}
 
 {% block content %}
 
   {# ── QUESTIONNAIRE ── #}
   <section class="quiz-section reveal" id="quiz">
     <div class="quiz-header">
-      <span class="section-eyebrow">✨ Персональный подбор</span>
-      <h2>Поможем выбрать<br><em>идеальный букет</em></h2>
-      <p class="quiz-subtitle">Ответьте на несколько вопросов — подберём лучший вариант из каталога специально для вас</p>
+      <span class="section-eyebrow">{{ t.quiz_eyebrow }}</span>
+      <h2>{{ t.quiz_title | safe }}</h2>
+      <p class="quiz-subtitle">{{ t.quiz_subtitle }}</p>
     </div>
 
     <div class="quiz-card">
-      <!-- Progress -->
       <div class="quiz-progress">
         <div class="quiz-progress-bar" id="quiz-progress-bar"></div>
       </div>
-      <div class="quiz-step-label" id="quiz-step-label">Шаг 1 из 5</div>
+      <div class="quiz-step-label" id="quiz-step-label">{{ t.quiz_step_label }} 1 {{ t.quiz_step_of }} 5</div>
 
-      <!-- Steps -->
       <div class="quiz-steps" id="quiz-steps">
 
-        <!-- Step 1: For whom -->
+        <!-- Step 1 -->
         <div class="quiz-step active" data-step="1">
-          <div class="quiz-question">Кому дарите?</div>
+          <div class="quiz-question">{{ t.quiz_q1 }}</div>
           <div class="quiz-chips" data-field="for_whom">
-            <button class="quiz-chip" data-value="mom">👩 Маме</button>
-            <button class="quiz-chip" data-value="girlfriend">💕 Девушке</button>
-            <button class="quiz-chip" data-value="wife">💍 Жене</button>
-            <button class="quiz-chip" data-value="friend">👭 Подруге</button>
-            <button class="quiz-chip" data-value="colleague">🤝 Коллеге</button>
-            <button class="quiz-chip" data-value="teacher">📚 Учителю</button>
-            <button class="quiz-chip" data-value="man">👨 Мужчине</button>
-            <button class="quiz-chip" data-value="child">🧒 Ребёнку</button>
+            <button class="quiz-chip" data-value="mom">{{ t.quiz_mom }}</button>
+            <button class="quiz-chip" data-value="girlfriend">{{ t.quiz_girlfriend }}</button>
+            <button class="quiz-chip" data-value="wife">{{ t.quiz_wife }}</button>
+            <button class="quiz-chip" data-value="friend">{{ t.quiz_friend }}</button>
+            <button class="quiz-chip" data-value="colleague">{{ t.quiz_colleague }}</button>
+            <button class="quiz-chip" data-value="teacher">{{ t.quiz_teacher }}</button>
+            <button class="quiz-chip" data-value="man">{{ t.quiz_man }}</button>
+            <button class="quiz-chip" data-value="child">{{ t.quiz_child }}</button>
           </div>
         </div>
 
-        <!-- Step 2: Occasion -->
+        <!-- Step 2 -->
         <div class="quiz-step" data-step="2">
-          <div class="quiz-question">Какой повод?</div>
+          <div class="quiz-question">{{ t.quiz_q2 }}</div>
           <div class="quiz-chips" data-field="occasion">
-            <button class="quiz-chip" data-value="birthday">🎂 День рождения</button>
-            <button class="quiz-chip" data-value="romance">💝 Свидание</button>
-            <button class="quiz-chip" data-value="wedding">💍 Свадьба</button>
-            <button class="quiz-chip" data-value="graduation">🎓 Выпускной</button>
-            <button class="quiz-chip" data-value="anniversary">🥂 Юбилей</button>
-            <button class="quiz-chip" data-value="corporate">🤝 Корпоратив</button>
-            <button class="quiz-chip" data-value="just_because">🌸 Просто так</button>
+            <button class="quiz-chip" data-value="birthday">{{ t.quiz_birthday }}</button>
+            <button class="quiz-chip" data-value="romance">{{ t.quiz_romance }}</button>
+            <button class="quiz-chip" data-value="wedding">{{ t.quiz_wedding }}</button>
+            <button class="quiz-chip" data-value="graduation">{{ t.quiz_graduation }}</button>
+            <button class="quiz-chip" data-value="anniversary">{{ t.quiz_anniversary }}</button>
+            <button class="quiz-chip" data-value="corporate">{{ t.quiz_corporate }}</button>
+            <button class="quiz-chip" data-value="just_because">{{ t.quiz_just_because }}</button>
           </div>
         </div>
 
-        <!-- Step 3: Age -->
+        <!-- Step 3 -->
         <div class="quiz-step" data-step="3">
-          <div class="quiz-question">Сколько лет получателю?</div>
+          <div class="quiz-question">{{ t.quiz_q3 }}</div>
           <div class="quiz-chips" data-field="age_range">
-            <button class="quiz-chip" data-value="under18">До 18 лет 🧒</button>
-            <button class="quiz-chip" data-value="18-30">18–30 лет 🌺</button>
-            <button class="quiz-chip" data-value="30-50">30–50 лет 💐</button>
-            <button class="quiz-chip" data-value="50plus">50+ лет 🌹</button>
+            <button class="quiz-chip" data-value="under18">{{ t.quiz_under18 }}</button>
+            <button class="quiz-chip" data-value="18-30">{{ t.quiz_18_30 }}</button>
+            <button class="quiz-chip" data-value="30-50">{{ t.quiz_30_50 }}</button>
+            <button class="quiz-chip" data-value="50plus">{{ t.quiz_50plus }}</button>
           </div>
         </div>
 
-        <!-- Step 4: Budget -->
+        <!-- Step 4 -->
         <div class="quiz-step" data-step="4">
-          <div class="quiz-question">Какой бюджет?</div>
+          <div class="quiz-question">{{ t.quiz_q4 }}</div>
           <div class="quiz-chips" data-field="budget">
-            <button class="quiz-chip" data-value="60">До 60₼</button>
-            <button class="quiz-chip" data-value="100">60–100₼</button>
-            <button class="quiz-chip" data-value="200">100–200₼</button>
-            <button class="quiz-chip" data-value="9999">200₼+</button>
+            <button class="quiz-chip" data-value="60">{{ t.quiz_60 }}</button>
+            <button class="quiz-chip" data-value="100">{{ t.quiz_100 }}</button>
+            <button class="quiz-chip" data-value="200">{{ t.quiz_200 }}</button>
+            <button class="quiz-chip" data-value="9999">{{ t.quiz_9999 }}</button>
           </div>
         </div>
 
-        <!-- Step 5: Flowers -->
+        <!-- Step 5 -->
         <div class="quiz-step" data-step="5">
-          <div class="quiz-question">Предпочтения в цветах?</div>
+          <div class="quiz-question">{{ t.quiz_q5 }}</div>
           <div class="quiz-chips" data-field="flowers">
-            <button class="quiz-chip" data-value="роза">🌹 Розы</button>
-            <button class="quiz-chip" data-value="пион">🌸 Пионы</button>
-            <button class="quiz-chip" data-value="тюльпан">🌷 Тюльпаны</button>
-            <button class="quiz-chip" data-value="ромашка">🌼 Полевые</button>
-            <button class="quiz-chip" data-value="any">✨ Без разницы</button>
+            <button class="quiz-chip" data-value="роза">{{ t.quiz_rose }}</button>
+            <button class="quiz-chip" data-value="пион">{{ t.quiz_peony }}</button>
+            <button class="quiz-chip" data-value="тюльпан">{{ t.quiz_tulip }}</button>
+            <button class="quiz-chip" data-value="ромашка">{{ t.quiz_daisy }}</button>
+            <button class="quiz-chip" data-value="any">{{ t.quiz_any }}</button>
           </div>
         </div>
 
       </div>
 
-      <!-- Navigation -->
       <div class="quiz-nav">
-        <button class="quiz-btn quiz-btn-back" id="quiz-back" style="display:none" type="button">← Назад</button>
-        <button class="quiz-btn quiz-btn-next" id="quiz-next" type="button" disabled>Далее →</button>
-        <button class="quiz-btn quiz-btn-submit" id="quiz-submit" style="display:none" type="button">🌸 Подобрать букет</button>
+        <button class="quiz-btn quiz-btn-back" id="quiz-back" style="display:none" type="button">{{ t.quiz_back }}</button>
+        <button class="quiz-btn quiz-btn-next" id="quiz-next" type="button" disabled>{{ t.quiz_next }}</button>
+        <button class="quiz-btn quiz-btn-submit" id="quiz-submit" style="display:none" type="button">{{ t.quiz_submit }}</button>
       </div>
     </div>
 
-    <!-- Results -->
     <div class="quiz-results" id="quiz-results" style="display:none">
-      <div class="quiz-results-title">🎯 Лучшие варианты для вас</div>
+      <div class="quiz-results-title">{{ t.quiz_results_title }}</div>
       <div class="quiz-results-grid" id="quiz-results-grid"></div>
-      <button class="quiz-reset" id="quiz-reset" type="button">Начать заново</button>
+      <p class="quiz-no-results" id="quiz-no-results" style="display:none">{{ t.quiz_no_results }}</p>
+      <button class="quiz-reset" id="quiz-reset" type="button">{{ t.quiz_reset }}</button>
     </div>
   </section>
 
   {# ── MARKET ANALYSIS ── #}
   <section class="summary reveal" id="catalog">
     <div class="section-title">
-      <span class="section-eyebrow">📊 Анализ рынка</span>
-      <h2>Лучшие предложения <em>прямо сейчас</em></h2>
+      <span class="section-eyebrow">{{ t.analysis_eyebrow }}</span>
+      <h2>{{ t.analysis_title | safe }}</h2>
     </div>
     <div class="meta-grid">
       <div class="meta-item">
-        <strong>Всего предложений</strong>
+        <strong>{{ t.analysis_total }}</strong>
         <div class="meta-value">{{ analysis.total_offers }}</div>
       </div>
       <div class="meta-item">
-        <strong>Средняя цена</strong>
+        <strong>{{ t.analysis_avg }}</strong>
         <div class="meta-value">{{ analysis.average_price }} ₼</div>
       </div>
       <div class="meta-item">
-        <strong>Диапазон цен</strong>
+        <strong>{{ t.analysis_range }}</strong>
         <div class="meta-value">{{ analysis.min_price }} — {{ analysis.max_price }} ₼</div>
       </div>
       <div class="meta-item">
-        <strong>Популярные цветы</strong>
+        <strong>{{ t.analysis_popular }}</strong>
         <div class="meta-value" style="font-size:15px;line-height:1.4">{{ analysis.top_flowers | join(' · ') }}</div>
       </div>
     </div>
   </section>
 
-  {# ── OCCASION TABS ── #}
+  {# ── OCCASION TABS + CATALOG ── #}
   <section class="offers-section" id="catalog-grid">
     <div class="section-title reveal">
-      <span class="section-eyebrow">🛍️ Каталог</span>
-      <h2>Букеты из <em>магазинов Баку</em></h2>
+      <span class="section-eyebrow">{{ t.catalog_eyebrow }}</span>
+      <h2>{{ t.catalog_title | safe }}</h2>
     </div>
 
-    <div class="occasion-tabs reveal" id="occasion-tabs">
+    <div class="occasion-cards reveal" id="occasion-cards">
       {% for occ in occasions %}
       <button
-        class="occasion-tab{% if occ.key == selected_occasion %} active{% endif %}"
+        class="occasion-card{% if occ.key == selected_occasion %} active{% endif %}"
         data-occasion="{{ occ.key }}"
+        style="background:{{ occ.color }}"
         type="button"
-      >{{ occ.label }}</button>
+      >
+        <span class="occ-icon">{{ occ.icon }}</span>
+        <span>{{ occ.label }}</span>
+      </button>
       {% endfor %}
     </div>
 
@@ -151,11 +152,9 @@
         <article class="offer-card reveal" data-occasion="{{ offer.occasion | join(',') }}" data-id="{{ offer.id }}">
 
           <div class="offer-image">
-            {% if offer.photo %}
-              <img src="{{ offer.photo }}" alt="{{ offer.title }}" loading="lazy">
-            {% endif %}
+            <img src="{{ offer.photo }}" alt="{{ offer.title }}" loading="lazy">
             {% if offer.is_special %}
-              <div class="badge badge-special">🔥 Спецпредложение</div>
+              <div class="badge badge-special">{{ t.badge_special }}</div>
             {% else %}
               <div class="badge">{{ offer.category }}</div>
             {% endif %}
@@ -169,18 +168,12 @@
             <h3>{{ offer.title }}</h3>
           </div>
 
-          {% if offer.shop %}
-          <div style="padding:0 22px 2px;display:flex;align-items:center;gap:6px">
-            <span style="font-size:11px;background:#fff0f7;color:var(--rose);border:1px solid rgba(232,23,93,.2);
-                         padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.3px">
-              🏪 {{ offer.shop }}
-            </span>
+          <div style="padding:0 22px 2px">
             <span style="font-size:11px;color:var(--muted)">{{ offer.occasion_display }}</span>
           </div>
-          {% endif %}
 
           <p class="desc">{{ offer.description }}</p>
-          <p class="composition"><strong>Состав:</strong> {{ offer.composition | join(', ') }}</p>
+          <p class="composition"><strong>{{ t.catalog_composition }}</strong> {{ offer.composition | join(', ') }}</p>
 
           {% if offer.delivery_time %}
             <p class="delivery-time"><small>⏱️ {{ offer.delivery_time }}</small></p>
@@ -188,23 +181,113 @@
 
           <div class="card-bottom">
             <div class="price-wrap">
-              <div class="price">{{ offer.price }}<span class="price-currency">₼</span></div>
+              <div class="price">{{ offer.display_price }}<span class="price-currency">₼</span></div>
               {% if offer.is_special and offer.original_price %}
               <div class="price-old">{{ offer.original_price }}₼</div>
               {% endif %}
             </div>
-            <a class="button primary" href="{{ url_for('order', offer_id=offer.id) }}">Заказать</a>
+            <a class="button primary" href="{{ url_for('order', offer_id=offer.id) }}">{{ t.catalog_btn_order }}</a>
           </div>
         </article>
+
       {% else %}
         <div class="no-offers-msg">
-          <div style="font-size:48px">🌸</div>
-          <p>По данному поводу предложений пока нет.<br>
-             <a href="{{ url_for('index') }}">Показать все букеты →</a></p>
+          <div class="no-offers-flower-wrap" id="no-offers-flower"></div>
+          <p>{{ t.catalog_no_offers | safe }}</p>
+          <a class="btn-primary" href="{{ url_for('builder') }}" style="display:inline-block;margin-top:20px">
+            {{ t.catalog_no_offers_link }}
+          </a>
         </div>
       {% endfor %}
     </div>
   </section>
+
+  {# ── SWEET BOUQUETS ── #}
+  {% if sweets_offers %}
+  <section class="offers-section category-section" id="sweets">
+    <div class="section-title reveal">
+      <span class="section-eyebrow">{{ t.cat_sweets }}</span>
+      <p class="cat-subtitle">{{ t.cat_sweets_sub }}</p>
+    </div>
+    <div class="offers" id="sweets-grid">
+      {% for offer in sweets_offers %}
+        <article class="offer-card reveal" data-id="{{ offer.id }}">
+          <div class="offer-image">
+            <img src="{{ offer.photo }}" alt="{{ offer.title }}" loading="lazy">
+            <div class="badge">🍬</div>
+            <div class="card-bloom" data-bloom></div>
+          </div>
+          <div class="card-top"><h3>{{ offer.title }}</h3></div>
+          <p class="desc">{{ offer.description }}</p>
+          <div class="card-bottom">
+            <div class="price-wrap">
+              <div class="price">{{ offer.display_price }}<span class="price-currency">₼</span></div>
+            </div>
+            <a class="button primary" href="{{ url_for('order', offer_id=offer.id) }}">{{ t.catalog_btn_order }}</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ── FOOD BOUQUETS ── #}
+  {% if food_offers %}
+  <section class="offers-section category-section" id="food">
+    <div class="section-title reveal">
+      <span class="section-eyebrow">{{ t.cat_food }}</span>
+      <p class="cat-subtitle">{{ t.cat_food_sub }}</p>
+    </div>
+    <div class="offers" id="food-grid">
+      {% for offer in food_offers %}
+        <article class="offer-card reveal" data-id="{{ offer.id }}">
+          <div class="offer-image">
+            <img src="{{ offer.photo }}" alt="{{ offer.title }}" loading="lazy">
+            <div class="badge">🍓</div>
+            <div class="card-bloom" data-bloom></div>
+          </div>
+          <div class="card-top"><h3>{{ offer.title }}</h3></div>
+          <p class="desc">{{ offer.description }}</p>
+          <div class="card-bottom">
+            <div class="price-wrap">
+              <div class="price">{{ offer.display_price }}<span class="price-currency">₼</span></div>
+            </div>
+            <a class="button primary" href="{{ url_for('order', offer_id=offer.id) }}">{{ t.catalog_btn_order }}</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ── ALCOHOL BOUQUETS ── #}
+  {% if alcohol_offers %}
+  <section class="offers-section category-section" id="alcohol">
+    <div class="section-title reveal">
+      <span class="section-eyebrow">{{ t.cat_alcohol }}</span>
+      <p class="cat-subtitle">{{ t.cat_alcohol_sub }}</p>
+    </div>
+    <div class="offers" id="alcohol-grid">
+      {% for offer in alcohol_offers %}
+        <article class="offer-card reveal" data-id="{{ offer.id }}">
+          <div class="offer-image">
+            <img src="{{ offer.photo }}" alt="{{ offer.title }}" loading="lazy">
+            <div class="badge">🥃</div>
+            <div class="card-bloom" data-bloom></div>
+          </div>
+          <div class="card-top"><h3>{{ offer.title }}</h3></div>
+          <p class="desc">{{ offer.description }}</p>
+          <div class="card-bottom">
+            <div class="price-wrap">
+              <div class="price">{{ offer.display_price }}<span class="price-currency">₼</span></div>
+            </div>
+            <a class="button primary" href="{{ url_for('order', offer_id=offer.id) }}">{{ t.catalog_btn_order }}</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 
   {# ── DELIVERY INFO ── #}
   <section id="delivery" style="
@@ -217,8 +300,8 @@
     z-index: 1;
   ">
     <div class="section-title reveal" style="margin-bottom:40px">
-      <span class="section-eyebrow" style="color:var(--gold)">🚗 Доставка</span>
-      <h2 style="color:#fff">Быстро, аккуратно, <em>по всему Баку</em></h2>
+      <span class="section-eyebrow" style="color:var(--gold)">{{ t.delivery_eyebrow }}</span>
+      <h2 style="color:#fff">{{ t.delivery_title | safe }}</h2>
     </div>
     <div style="
       display:grid;
@@ -228,11 +311,11 @@
       margin:0 auto;
     " class="reveal">
       {% for feat in [
-        ('🚗','От 60 минут','Доставка по всему городу'),
-        ('🎁','Бесплатная упаковка','Открытка в подарок'),
-        ('🌡️','Термобоксы','Цветы сохранятся даже в жару'),
-        ('📅','Предзаказ','Запомним вашу особую дату'),
-        ('💳','Любая оплата','Карта, наличные или WhatsApp'),
+        ('🚗', t.del1_title, t.del1_desc),
+        ('🎁', t.del2_title, t.del2_desc),
+        ('🌡️', t.del3_title, t.del3_desc),
+        ('📅', t.del4_title, t.del4_desc),
+        ('💳', t.del5_title, t.del5_desc),
       ] %}
       <div style="
         background:rgba(255,255,255,.06);

@@ -67,14 +67,14 @@ def get_lang():
 
 def get_occasions(t):
     return [
-        {"key": "all",         "label": t['occ_all']},
-        {"key": "romance",     "label": t['occ_romance']},
-        {"key": "birthday",    "label": t['occ_birthday']},
-        {"key": "wedding",     "label": t['occ_wedding']},
-        {"key": "graduation",  "label": t['occ_graduation']},
-        {"key": "anniversary", "label": t['occ_anniversary']},
-        {"key": "corporate",   "label": t['occ_corporate']},
-        {"key": "just_because","label": t['occ_just_because']},
+        {"key": "all",         "label": t['occ_all'],         "icon": "🌸", "color": "#9E9E9E"},
+        {"key": "romance",     "label": t['occ_romance'],     "icon": "💕", "color": "#FF6B8A"},
+        {"key": "birthday",    "label": t['occ_birthday'],    "icon": "🎂", "color": "#FFB347"},
+        {"key": "wedding",     "label": t['occ_wedding'],     "icon": "💍", "color": "#C9A84C"},
+        {"key": "graduation",  "label": t['occ_graduation'],  "icon": "🎓", "color": "#7EC8A4"},
+        {"key": "anniversary", "label": t['occ_anniversary'], "icon": "🥂", "color": "#8B1A4A"},
+        {"key": "corporate",   "label": t['occ_corporate'],   "icon": "🤝", "color": "#4A7AB5"},
+        {"key": "just_because","label": t['occ_just_because'],"icon": "🌷", "color": "#C4A7E7"},
     ]
 
 @app.context_processor
@@ -121,6 +121,13 @@ def index():
     for o in fresh:
         o['display_price'] = markup_price(o['price'])
 
+    sweets_offers  = [o for o in fresh if o.get('type') == 'sweets']
+    food_offers    = [o for o in fresh if o.get('type') == 'food']
+    alcohol_offers = [o for o in fresh if o.get('type') == 'alcohol']
+    for lst in (sweets_offers, food_offers, alcohol_offers):
+        for o in lst:
+            o['display_price'] = markup_price(o['price'])
+
     return render_template(
         "index.html",
         offers=filtered,
@@ -128,6 +135,9 @@ def index():
         analysis=analyze_offers(fresh),
         occasions=occasions,
         selected_occasion=selected,
+        sweets_offers=sweets_offers,
+        food_offers=food_offers,
+        alcohol_offers=alcohol_offers,
     )
 
 
