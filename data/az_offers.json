@@ -1,101 +1,224 @@
 [
   {
-    "id": "sce2b6fa06",
+    "id": "cur001",
+    "title": "Букет из 25 алых роз",
     "type": "flowers",
-    "title": "Ən çox satılanlar",
     "occasion": [
-      "just_because",
-      "birthday"
+      "romance",
+      "birthday",
+      "anniversary"
     ],
-    "occasion_display": "Просто так / День рождения",
+    "occasion_display": "Романтика / День рождения",
     "category": "Свежее",
     "composition": [
-      "satılanlar"
+      "роза",
+      "гипсофила"
     ],
-    "price": 50,
+    "price": 65,
     "currency": "AZN",
-    "description": "Красота, собранная в одном месте — ради одного особенного человека.",
+    "display_price": 72,
+    "description": "Классика, которая никогда не устаревает: алые розы говорят о любви красноречивее любых слов.",
     "delivery_time": "Доставка по Баку",
-    "photo": "https://buket.az/assets/images/wm1.svg",
+    "photo": "https://buket.az/storage/products/2024/rose-25-red.jpg",
     "shop": "Buket.az",
     "shop_url": "https://buket.az",
     "is_special": false,
     "for_whom": [
-      "friend",
-      "mom",
-      "girlfriend"
+      "girlfriend",
+      "wife"
     ],
     "age_range": [
       "18-30",
       "30-50"
     ],
     "colors": [
-      "mixed"
+      "red"
     ],
-    "tags": [],
-    "scraped_at": "2026-06-04T14:07:48.741945"
+    "tags": []
   },
   {
-    "id": "sc7f102206",
+    "id": "cur002",
+    "title": "Монобукет 51 роза микс",
     "type": "flowers",
-    "title": "Ən çox satılanlar",
     "occasion": [
-      "just_because",
-      "birthday"
+      "anniversary",
+      "wedding",
+      "romance"
     ],
-    "occasion_display": "Просто так / День рождения",
+    "occasion_display": "Юбилей / Свадьба",
     "category": "Свежее",
     "composition": [
-      "satılanlar"
+      "роза"
     ],
-    "price": 250,
+    "price": 130,
     "currency": "AZN",
-    "description": "Свежий букет, собранный с любовью — лучший способ сказать что-то важное без слов.",
+    "display_price": 143,
+    "description": "Пятьдесят один лепесток — пятьдесят одна причина улыбнуться. Роскошный букет на особый день.",
     "delivery_time": "Доставка по Баку",
-    "photo": "https://buket.az/assets/images/wm1.svg",
+    "photo": "https://buket.az/storage/products/2024/rose-51-mix.jpg",
     "shop": "Buket.az",
     "shop_url": "https://buket.az",
     "is_special": false,
     "for_whom": [
-      "friend",
-      "mom",
+      "wife",
       "girlfriend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "red",
+      "pink",
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur003",
+    "title": "Белые розы и эустома",
+    "type": "flowers",
+    "occasion": [
+      "wedding",
+      "corporate",
+      "just_because"
+    ],
+    "occasion_display": "Свадьба / Корпоратив",
+    "category": "Свежее",
+    "composition": [
+      "роза",
+      "эустома",
+      "гипсофила"
+    ],
+    "price": 85,
+    "currency": "AZN",
+    "display_price": 94,
+    "description": "Нежное сочетание белоснежных роз и лизиантуса — воплощение чистоты и элегантности.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/rose-white-eustoma.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "colleague",
+      "teacher",
+      "mom"
+    ],
+    "age_range": [
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur004",
+    "title": "Пионы в шляпной коробке",
+    "type": "flowers",
+    "occasion": [
+      "birthday",
+      "romance",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Романтика",
+    "category": "Свежее",
+    "composition": [
+      "пион"
+    ],
+    "price": 110,
+    "currency": "AZN",
+    "display_price": 121,
+    "description": "Пышные пионы в нежно-розовых тонах, упакованные в стильную шляпную коробку. Подарок, который запомнят.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/peony-box-pink.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "girlfriend",
+      "wife",
+      "mom"
     ],
     "age_range": [
       "18-30",
       "30-50"
     ],
     "colors": [
-      "mixed"
+      "pink"
     ],
-    "tags": [],
-    "scraped_at": "2026-06-04T14:07:48.742241"
+    "tags": []
   },
   {
-    "id": "sca0265b7a",
+    "id": "cur005",
+    "title": "Букет из 15 пионов",
     "type": "flowers",
-    "title": "Ən çox satılanlar",
     "occasion": [
-      "just_because",
-      "birthday"
+      "birthday",
+      "anniversary",
+      "romance"
     ],
-    "occasion_display": "Просто так / День рождения",
+    "occasion_display": "День рождения / Юбилей",
     "category": "Свежее",
     "composition": [
-      "satılanlar"
+      "пион",
+      "лавандовый статис"
     ],
     "price": 95,
     "currency": "AZN",
-    "description": "Свежий букет, собранный с любовью — лучший способ сказать что-то важное без слов.",
+    "display_price": 105,
+    "description": "Каждый пион — целый мир нежности. Этот букет наполнит любую комнату ароматом счастья.",
     "delivery_time": "Доставка по Баку",
-    "photo": "https://buket.az/assets/images/wm1.svg",
+    "photo": "https://buket.az/storage/products/2024/peony-15-white.jpg",
     "shop": "Buket.az",
     "shop_url": "https://buket.az",
     "is_special": false,
     "for_whom": [
-      "friend",
+      "girlfriend",
+      "wife",
       "mom",
-      "girlfriend"
+      "friend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "white",
+      "pink"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur006",
+    "title": "101 разноцветный тюльпан",
+    "type": "flowers",
+    "occasion": [
+      "birthday",
+      "anniversary",
+      "graduation"
+    ],
+    "occasion_display": "День рождения / Выпускной",
+    "category": "Свежее",
+    "composition": [
+      "тюльпан"
+    ],
+    "price": 120,
+    "currency": "AZN",
+    "display_price": 132,
+    "description": "Море весенних красок — 101 тюльпан разных оттенков. Великолепие, которое невозможно проигнорировать.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/tulip-101-mix.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "girlfriend",
+      "mom",
+      "friend",
+      "teacher"
     ],
     "age_range": [
       "18-30",
@@ -104,33 +227,703 @@
     "colors": [
       "mixed"
     ],
-    "tags": [],
-    "scraped_at": "2026-06-04T14:07:48.742364"
+    "tags": []
   },
   {
-    "id": "sc426816d8",
+    "id": "cur007",
+    "title": "Тюльпаны и гипсофила",
     "type": "flowers",
-    "title": "Ən çox satılanlar",
+    "occasion": [
+      "graduation",
+      "birthday",
+      "just_because"
+    ],
+    "occasion_display": "Выпускной / День рождения",
+    "category": "Свежее",
+    "composition": [
+      "тюльпан",
+      "гипсофила"
+    ],
+    "price": 55,
+    "currency": "AZN",
+    "display_price": 61,
+    "description": "Нежные тюльпаны в облаке гипсофилы — первый знак весны и надежды для любимого человека.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/tulip-gyps-pink.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "girlfriend",
+      "teacher",
+      "child"
+    ],
+    "age_range": [
+      "under18",
+      "18-30"
+    ],
+    "colors": [
+      "pink",
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur008",
+    "title": "Полевые цветы в крафте",
+    "type": "flowers",
     "occasion": [
       "just_because",
+      "birthday",
+      "romance"
+    ],
+    "occasion_display": "Просто так / Романтика",
+    "category": "Свежее",
+    "composition": [
+      "ромашка",
+      "лаванда",
+      "васильки",
+      "злаки"
+    ],
+    "price": 48,
+    "currency": "AZN",
+    "display_price": 53,
+    "description": "Букет, который пахнет свободой и летним лугом. Для тех, кто ценит простоту и искренность.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/field-flowers-kraft.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "friend",
+      "girlfriend",
+      "mom"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur009",
+    "title": "Гортензии и розы",
+    "type": "flowers",
+    "occasion": [
+      "wedding",
+      "anniversary",
       "birthday"
+    ],
+    "occasion_display": "Свадьба / Юбилей",
+    "category": "Свежее",
+    "composition": [
+      "гортензия",
+      "роза",
+      "эустома"
+    ],
+    "price": 145,
+    "currency": "AZN",
+    "display_price": 160,
+    "description": "Воздушные шары гортензий в сочетании с розами — роскошный выбор для тех, кто ценит безупречный вкус.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/hydrangea-roses-white.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "wife",
+      "mom"
+    ],
+    "age_range": [
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "white",
+      "pink"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur010",
+    "title": "Альстромерия яркий микс",
+    "type": "flowers",
+    "occasion": [
+      "birthday",
+      "corporate",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Корпоратив",
+    "category": "Свежее",
+    "composition": [
+      "альстромерия",
+      "зелень"
+    ],
+    "price": 42,
+    "currency": "AZN",
+    "display_price": 47,
+    "description": "Цветы дружбы и радости — яркие альстромерии в пёстром миксе. Стойкие, как настоящие отношения.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/alstroemeria-mix.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "colleague",
+      "teacher",
+      "friend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur011",
+    "title": "Герберы и подсолнухи",
+    "type": "flowers",
+    "occasion": [
+      "birthday",
+      "just_because",
+      "graduation"
+    ],
+    "occasion_display": "День рождения / Просто так",
+    "category": "Свежее",
+    "composition": [
+      "гербера",
+      "подсолнух",
+      "зелень"
+    ],
+    "price": 58,
+    "currency": "AZN",
+    "display_price": 64,
+    "description": "Солнечный букет, который несёт тепло куда бы ни попал. Один взгляд — и день становится лучше.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/gerbera-sunflower.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "friend",
+      "child",
+      "colleague",
+      "teacher"
+    ],
+    "age_range": [
+      "under18",
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "yellow",
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur012",
+    "title": "Лилии и орхидеи",
+    "type": "flowers",
+    "occasion": [
+      "anniversary",
+      "wedding",
+      "birthday"
+    ],
+    "occasion_display": "Юбилей / Свадьба",
+    "category": "Свежее",
+    "composition": [
+      "лилия",
+      "орхидея",
+      "эустома"
+    ],
+    "price": 175,
+    "currency": "AZN",
+    "display_price": 193,
+    "description": "Королевский выбор: лилии с орхидеями — это не просто букет, это произведение искусства.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/lily-orchid-white.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "wife",
+      "mom"
+    ],
+    "age_range": [
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "white",
+      "purple"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur013",
+    "title": "Зефирный букет розовый",
+    "type": "sweets",
+    "occasion": [
+      "birthday",
+      "just_because",
+      "romance"
+    ],
+    "occasion_display": "День рождения / Просто так",
+    "category": "Зефирный",
+    "composition": [
+      "зефир",
+      "маршмеллоу",
+      "декор"
+    ],
+    "price": 55,
+    "currency": "AZN",
+    "display_price": 61,
+    "description": "Нежный букет из воздушного зефира — сладкий подарок, который хочется съесть и оставить на память.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/zefir-pink.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "girlfriend",
+      "child",
+      "friend"
+    ],
+    "age_range": [
+      "under18",
+      "18-30"
+    ],
+    "colors": [
+      "pink"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur014",
+    "title": "Маршмеллоу букет радуга",
+    "type": "sweets",
+    "occasion": [
+      "birthday",
+      "graduation",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Выпускной",
+    "category": "Зефирный",
+    "composition": [
+      "маршмеллоу",
+      "зефир",
+      "шоколад"
+    ],
+    "price": 70,
+    "currency": "AZN",
+    "display_price": 77,
+    "description": "Яркий букет из разноцветного маршмеллоу — детское счастье в руках взрослого человека.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/marshmallow-rainbow.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "child",
+      "friend",
+      "girlfriend"
+    ],
+    "age_range": [
+      "under18",
+      "18-30"
+    ],
+    "colors": [
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur015",
+    "title": "Букет из конфет Rafaello",
+    "type": "sweets",
+    "occasion": [
+      "birthday",
+      "corporate",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Корпоратив",
+    "category": "Сладкий",
+    "composition": [
+      "конфеты Rafaello",
+      "декор",
+      "лента"
+    ],
+    "price": 80,
+    "currency": "AZN",
+    "display_price": 88,
+    "description": "Изысканный букет из белоснежных Rafaello — когда хочется подарить что-то необычное и вкусное.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/rafaello-bouquet.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "colleague",
+      "mom",
+      "teacher",
+      "girlfriend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur016",
+    "title": "Фруктовый букет клубника",
+    "type": "food",
+    "occasion": [
+      "birthday",
+      "romance",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Романтика",
+    "category": "Фруктовый",
+    "composition": [
+      "клубника",
+      "шоколад",
+      "декор"
+    ],
+    "price": 90,
+    "currency": "AZN",
+    "display_price": 99,
+    "description": "Клубника в шоколаде, оформленная как букет — свежесть и сладость в одном восхитительном подарке.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/strawberry-choco.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "girlfriend",
+      "wife",
+      "friend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "red",
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur017",
+    "title": "Экзотические фрукты микс",
+    "type": "food",
+    "occasion": [
+      "birthday",
+      "corporate",
+      "anniversary"
+    ],
+    "occasion_display": "День рождения / Корпоратив",
+    "category": "Фруктовый",
+    "composition": [
+      "клубника",
+      "виноград",
+      "ананас",
+      "манго"
+    ],
+    "price": 115,
+    "currency": "AZN",
+    "display_price": 127,
+    "description": "Яркий фруктовый букет из экзотики — полезный, вкусный и невероятно красивый подарок.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/fruit-exotic-mix.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "colleague",
+      "mom",
+      "man",
+      "girlfriend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur018",
+    "title": "Виски + роза — для него",
+    "type": "alcohol",
+    "occasion": [
+      "birthday",
+      "anniversary",
+      "corporate"
+    ],
+    "occasion_display": "День рождения / Юбилей",
+    "category": "Алкогольный",
+    "composition": [
+      "виски",
+      "роза",
+      "декор"
+    ],
+    "price": 120,
+    "currency": "AZN",
+    "display_price": 132,
+    "description": "Мужской букет с бутылкой виски и розой — когда хочется удивить настоящего мужчину.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/whiskey-rose.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "man"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "red"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur019",
+    "title": "Пивной букет для мужчины",
+    "type": "alcohol",
+    "occasion": [
+      "birthday",
+      "corporate",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Корпоратив",
+    "category": "Алкогольный",
+    "composition": [
+      "пиво",
+      "снеки",
+      "декор"
+    ],
+    "price": 85,
+    "currency": "AZN",
+    "display_price": 94,
+    "description": "Нестандартный подарок для тех, кто ценит оригинальность — пивной букет с закусками.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/beer-bouquet.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "man"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur020",
+    "title": "Коньяк и шоколад",
+    "type": "alcohol",
+    "occasion": [
+      "anniversary",
+      "birthday",
+      "corporate"
+    ],
+    "occasion_display": "Юбилей / Корпоратив",
+    "category": "Алкогольный",
+    "composition": [
+      "коньяк",
+      "шоколад",
+      "орехи"
+    ],
+    "price": 150,
+    "currency": "AZN",
+    "display_price": 165,
+    "description": "Роскошный подарочный набор с коньяком, шоколадом и орехами — для настоящих ценителей.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/cognac-chocolate.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "man"
+    ],
+    "age_range": [
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "mixed"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur021",
+    "title": "Хризантемы кустовые",
+    "type": "flowers",
+    "occasion": [
+      "birthday",
+      "corporate",
+      "just_because"
+    ],
+    "occasion_display": "День рождения / Корпоратив",
+    "category": "Свежее",
+    "composition": [
+      "хризантема",
+      "зелень"
+    ],
+    "price": 45,
+    "currency": "AZN",
+    "display_price": 50,
+    "description": "Пышные хризантемы создают объём и ощущение праздника одним своим присутствием.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/chrysanthemum-white.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "colleague",
+      "teacher",
+      "mom",
+      "friend"
+    ],
+    "age_range": [
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur022",
+    "title": "Ранункулюс и розы пастель",
+    "type": "flowers",
+    "occasion": [
+      "romance",
+      "birthday",
+      "wedding"
+    ],
+    "occasion_display": "Романтика / Свадьба",
+    "category": "Свежее",
+    "composition": [
+      "ранункулюс",
+      "роза",
+      "эустома"
+    ],
+    "price": 95,
+    "currency": "AZN",
+    "display_price": 105,
+    "description": "Воздушный пастельный букет из ранункулюса и роз — как утренний сад в розовых тонах.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/ranunculus-pastel.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "girlfriend",
+      "wife",
+      "friend"
+    ],
+    "age_range": [
+      "18-30",
+      "30-50"
+    ],
+    "colors": [
+      "pink",
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur023",
+    "title": "Фрезия и мимоза",
+    "type": "flowers",
+    "occasion": [
+      "just_because",
+      "birthday",
+      "corporate"
     ],
     "occasion_display": "Просто так / День рождения",
     "category": "Свежее",
     "composition": [
-      "satılanlar"
+      "фрезия",
+      "мимоза",
+      "зелень"
     ],
-    "price": 500,
+    "price": 52,
     "currency": "AZN",
-    "description": "Этот букет создан для тех особых моментов, которые хочется помнить вечно.",
+    "display_price": 58,
+    "description": "Нежная фрезия с яркой мимозой — весенний аромат и тёплый жёлтый свет для самых дорогих.",
     "delivery_time": "Доставка по Баку",
-    "photo": "https://buket.az/assets/images/wm1.svg",
+    "photo": "https://buket.az/storage/products/2024/freesia-mimosa.jpg",
     "shop": "Buket.az",
     "shop_url": "https://buket.az",
     "is_special": false,
     "for_whom": [
-      "friend",
       "mom",
+      "teacher",
+      "colleague"
+    ],
+    "age_range": [
+      "30-50",
+      "50plus"
+    ],
+    "colors": [
+      "yellow",
+      "white"
+    ],
+    "tags": []
+  },
+  {
+    "id": "cur024",
+    "title": "Эустома букет невесты",
+    "type": "flowers",
+    "occasion": [
+      "wedding",
+      "romance",
+      "anniversary"
+    ],
+    "occasion_display": "Свадьба / Романтика",
+    "category": "Свежее",
+    "composition": [
+      "эустома",
+      "роза",
+      "гипсофила"
+    ],
+    "price": 135,
+    "currency": "AZN",
+    "display_price": 149,
+    "description": "Лизиантус — цветок с характером: нежный снаружи и стойкий внутри, как настоящая любовь.",
+    "delivery_time": "Доставка по Баку",
+    "photo": "https://buket.az/storage/products/2024/eustoma-bridal-white.jpg",
+    "shop": "Buket.az",
+    "shop_url": "https://buket.az",
+    "is_special": false,
+    "for_whom": [
+      "wife",
       "girlfriend"
     ],
     "age_range": [
@@ -138,9 +931,9 @@
       "30-50"
     ],
     "colors": [
-      "mixed"
+      "white",
+      "purple"
     ],
-    "tags": [],
-    "scraped_at": "2026-06-04T14:07:48.742470"
+    "tags": []
   }
 ]

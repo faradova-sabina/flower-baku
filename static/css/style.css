@@ -1812,3 +1812,31 @@ input:focus, textarea:focus, select:focus {
 @keyframes overlay-fade-out {
   to { opacity: 0; }
 }
+
+/* ── Back to top FAB ── */
+.fab-top {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(26,10,20,.72);
+  border: 1px solid rgba(232,23,93,.3);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .3s, transform .3s;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.fab-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

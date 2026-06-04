@@ -2,6 +2,7 @@
 <html lang="{{ lang }}">
   <head>
     <meta charset="utf-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}DreamBouquet — Баку{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,17 +22,20 @@
     <!-- WhatsApp FAB -->
     <a class="fab-wa" href="https://wa.me/994702011930" title="WhatsApp">💬</a>
 
+    <!-- Back to top FAB -->
+    <button class="fab-top" id="fab-top" aria-label="Back to top" title="Наверх">↑</button>
+
     <!-- toast notification -->
     <div class="toast" id="toast">🌸 {{ t.catalog_btn_order }}!</div>
 
     <!-- Mobile nav overlay -->
     <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
       <button class="nav-overlay-close" id="nav-overlay-close" aria-label="Close">✕</button>
-      <a href="{{ url_for('index') }}#catalog">{{ t.nav_catalog }}</a>
-      <a href="{{ url_for('index') }}#quiz">{{ t.nav_quiz }}</a>
+      <a href="{{ url_for('index') }}#catalog" data-section="catalog">{{ t.nav_catalog }}</a>
+      <a href="{{ url_for('index') }}#quiz" data-section="quiz">{{ t.nav_quiz }}</a>
       <a href="{{ url_for('builder') }}">{{ t.nav_builder }}</a>
-      <a href="{{ url_for('index') }}#delivery">{{ t.nav_delivery }}</a>
-      <a href="#contact">{{ t.nav_contact }}</a>
+      <a href="{{ url_for('index') }}#delivery" data-section="delivery">{{ t.nav_delivery }}</a>
+      <a href="{{ url_for('index') }}#contact" data-section="contact">{{ t.nav_contact }}</a>
       <a href="tel:+994702011930" class="nav-overlay-cta">📞 +994 70 201-19-30</a>
       <!-- Lang switcher mobile -->
       <div class="lang-switcher-mobile">
@@ -48,11 +52,11 @@
           <span class="brand">Dream<span class="brand-accent">Bouquet</span></span>
         </a>
         <nav class="nav" role="navigation">
-          <a href="{{ url_for('index') }}#catalog">{{ t.nav_catalog }}</a>
-          <a href="{{ url_for('index') }}#quiz">{{ t.nav_quiz }}</a>
+          <a href="{{ url_for('index') }}#catalog" data-section="catalog">{{ t.nav_catalog }}</a>
+          <a href="{{ url_for('index') }}#quiz" data-section="quiz">{{ t.nav_quiz }}</a>
           <a href="{{ url_for('builder') }}" class="nav-builder-link">{{ t.nav_builder }}</a>
-          <a href="{{ url_for('index') }}#delivery">{{ t.nav_delivery }}</a>
-          <a href="#contact">{{ t.nav_contact }}</a>
+          <a href="{{ url_for('index') }}#delivery" data-section="delivery">{{ t.nav_delivery }}</a>
+          <a href="{{ url_for('index') }}#contact" data-section="contact">{{ t.nav_contact }}</a>
           <!-- Language switcher -->
           <div class="lang-switcher">
             {% for l in all_langs %}
