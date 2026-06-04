@@ -166,3 +166,48 @@ function makeFlowerSVGByType(type, size) {
     }, cfg.delay)
   })
 })()
+
+// ── SCROLL GARDEN ────────────────────────────────────────────
+;(function initScrollGarden() {
+  const container = document.getElementById('scroll-garden')
+  if (!container) return
+
+  const SCROLL_FLOWERS = [
+    { type: 'rose',  size: 60, style: 'top:15%;left:2%'  },
+    { type: 'peony', size: 55, style: 'top:30%;right:3%' },
+    { type: 'tulip', size: 58, style: 'top:45%;left:1%'  },
+    { type: 'rose',  size: 52, style: 'top:58%;right:4%' },
+    { type: 'peony', size: 60, style: 'top:70%;left:3%'  },
+    { type: 'tulip', size: 55, style: 'top:82%;right:2%' },
+    { type: 'rose',  size: 50, style: 'top:90%;left:5%'  },
+    { type: 'peony', size: 58, style: 'top:95%;right:5%' },
+  ]
+
+  SCROLL_FLOWERS.forEach(cfg => {
+    const el = document.createElement('div')
+    el.className = 'flower'
+    el.style.cssText = cfg.style + ';width:' + cfg.size + 'px;height:' + cfg.size + 'px;opacity:0.4;'
+    el.innerHTML = makeFlowerSVGByType(cfg.type, cfg.size)
+    container.appendChild(el)
+  })
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return
+      const el = e.target
+      el.querySelectorAll('.petal').forEach(p => { p.style.willChange = 'transform' })
+      el.classList.add('blooming')
+      const petals = el.querySelectorAll('.petal')
+      const last = petals[petals.length - 1]
+      if (last) {
+        last.addEventListener('animationend', () => {
+          el.classList.add('bloomed')
+          petals.forEach(p => { p.style.willChange = 'auto' })
+        }, { once: true })
+      }
+      observer.unobserve(el)
+    })
+  }, { threshold: 0.2, rootMargin: '0px 0px -50px 0px' })
+
+  container.querySelectorAll('.flower').forEach(el => observer.observe(el))
+})()
