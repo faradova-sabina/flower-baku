@@ -285,14 +285,14 @@ scene.add(new THREE.Points(particleGeo, particleMat));
    Each flower = real photo PNG billboard sprite
 ══════════════════════════════════════════════ */
 
-// Real flower photo URLs (Unsplash, free to use)
+// Real flower photo URLs (local files)
 const FLOWER_PHOTOS = {
-  rose:          'https://images.unsplash.com/photo-1548547638-91a3d8fc4c7e?w=600&h=600&fit=crop&auto=format&q=85',
-  peony:         'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=600&h=600&fit=crop&auto=format&q=85',
-  tulip:         'https://images.unsplash.com/photo-1520763185298-1b434c919102?w=600&h=600&fit=crop&auto=format&q=85',
-  chrysanthemum: 'https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=600&h=600&fit=crop&auto=format&q=85',
-  lily:          'https://images.unsplash.com/photo-1590736969596-fbf9af5a0f34?w=600&h=600&fit=crop&auto=format&q=85',
-  sunflower:     'https://images.unsplash.com/photo-1497861084185-5b24c20a0cff?w=600&h=600&fit=crop&auto=format&q=85',
+  rose:          '/static/images/flowers/rose.jpg',
+  peony:         '/static/images/flowers/peony.jpg',
+  tulip:         '/static/images/flowers/tulip.jpg',
+  chrysanthemum: '/static/images/flowers/chrysanthemum.jpg',
+  lily:          '/static/images/flowers/lily.jpg',
+  sunflower:     '/static/images/flowers/sunflower.jpg',
 };
 
 // Cache of loaded canvas textures
@@ -316,26 +316,26 @@ function buildFlowerTexture(type) {
   ctx.fillRect(0, 0, sz, sz);
 
   const img = new Image();
-  img.crossOrigin = 'anonymous';
   img.onload = () => {
     ctx.clearRect(0, 0, sz, sz);
 
-    // Draw photo with slight oval crop (flower shape)
+    // Draw photo clipped to soft ellipse
     ctx.save();
     ctx.beginPath();
-    ctx.ellipse(sz/2, sz*0.52, sz*0.46, sz*0.48, 0, 0, Math.PI * 2);
+    ctx.ellipse(sz/2, sz*0.50, sz*0.44, sz*0.46, 0, 0, Math.PI * 2);
     ctx.clip();
     ctx.drawImage(img, 0, 0, sz, sz);
     ctx.restore();
 
-    // Soft radial fade at edges
-    const fade = ctx.createRadialGradient(sz/2, sz*0.52, sz*0.28, sz/2, sz*0.52, sz*0.5);
-    fade.addColorStop(0,   'rgba(0,0,0,0)');
-    fade.addColorStop(0.75,'rgba(0,0,0,0)');
-    fade.addColorStop(1,   'rgba(0,0,0,1)');
+    // Soft vignette to remove background
+    const fade = ctx.createRadialGradient(sz/2, sz*0.50, sz*0.22, sz/2, sz*0.50, sz*0.48);
+    fade.addColorStop(0,    'rgba(0,0,0,0)');
+    fade.addColorStop(0.65, 'rgba(0,0,0,0)');
+    fade.addColorStop(1,    'rgba(0,0,0,1)');
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = fade;
     ctx.fillRect(0, 0, sz, sz);
+    ctx.globalCompositeOperation = 'source-over';
 
     tex.needsUpdate = true;
   };
@@ -362,15 +362,12 @@ function buildFlowerTexture(type) {
 function createPhotoFlower(type, hexColor) {
   const tex = buildFlowerTexture(type);
 
-  // Parse tint color — lighten it slightly so it blends well with the photo
-  const col = new THREE.Color(hexColor);
-
   const mat = new THREE.SpriteMaterial({
     map: tex,
     transparent: true,
     alphaTest: 0.01,
     depthWrite: false,
-    color: col,
+    color: new THREE.Color(1, 1, 1),
     sizeAttenuation: true,
   });
 
