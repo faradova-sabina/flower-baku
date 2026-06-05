@@ -184,6 +184,9 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 /* ══════════════════════════════════════════════
    STATE
@@ -204,440 +207,237 @@ const wrap   = canvas.closest('.builder-canvas-wrap');
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.4;
+renderer.toneMappingExposure = 1.2;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0d0020);
-scene.fog = new THREE.FogExp2(0x0d0020, 0.04);
+scene.background = new THREE.Color(0x0a001a);
+scene.fog = new THREE.FogExp2(0x0a001a, 0.03);
 
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
-camera.position.set(0, 3, 9);
-camera.lookAt(0, 1, 0);
+camera.position.set(0, 2.5, 8);
+camera.lookAt(0, 1.2, 0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 1.5, 0);
+controls.target.set(0, 1.2, 0);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 1.2;
-controls.minDistance = 4;
-controls.maxDistance = 18;
+controls.autoRotateSpeed = 0.9;
+controls.minDistance = 3;
+controls.maxDistance = 16;
 controls.minPolarAngle = Math.PI * 0.1;
 controls.maxPolarAngle = Math.PI * 0.78;
 
+/* ── POST-PROCESSING ── */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.35, 0.4, 0.85);
+composer.addPass(bloomPass);
+
 /* ── LIGHTS ── */
-const ambientLight = new THREE.AmbientLight(0xffeedd, 0.6);
-scene.add(ambientLight);
+scene.add(new THREE.AmbientLight(0xffeedd, 1.2));
 
-const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
-keyLight.position.set(4, 8, 5);
-keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(2048, 2048);
-keyLight.shadow.camera.near = 0.5;
-keyLight.shadow.camera.far = 30;
-keyLight.shadow.camera.left = -8;
-keyLight.shadow.camera.right = 8;
-keyLight.shadow.camera.top = 8;
-keyLight.shadow.camera.bottom = -8;
-keyLight.shadow.bias = -0.001;
-scene.add(keyLight);
+const key = new THREE.DirectionalLight(0xfff5ee, 2.8);
+key.position.set(4, 8, 6);
+scene.add(key);
 
-const fillLight = new THREE.DirectionalLight(0xe8b4d0, 0.8);
-fillLight.position.set(-5, 3, -3);
-scene.add(fillLight);
+const fill = new THREE.DirectionalLight(0xe8d0ff, 0.9);
+fill.position.set(-5, 3, -4);
+scene.add(fill);
 
-const rimLight = new THREE.DirectionalLight(0x7040ff, 0.6);
-rimLight.position.set(0, 5, -8);
-scene.add(rimLight);
+const rim = new THREE.DirectionalLight(0x8060ff, 0.5);
+rim.position.set(0, 6, -9);
+scene.add(rim);
 
-// Warm uplight from below
-const upLight = new THREE.PointLight(0xff6060, 1.2, 12);
-upLight.position.set(0, -2, 0);
-scene.add(upLight);
+const up = new THREE.PointLight(0xff6080, 0.8, 10);
+up.position.set(0, -3, 0);
+scene.add(up);
 
-// Sparkle point lights
+/* ── SPARKLE POINT LIGHTS ── */
 const sparkles = [];
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < 4; i++) {
   const pl = new THREE.PointLight(0xffcc44, 0, 6);
   pl.position.set(
-    Math.cos(i * Math.PI * 2 / 3) * 3,
-    2 + i,
-    Math.sin(i * Math.PI * 2 / 3) * 3
+    Math.cos(i * Math.PI * 0.5) * 2.5,
+    1.5 + i * 0.5,
+    Math.sin(i * Math.PI * 0.5) * 2.5
   );
   scene.add(pl);
   sparkles.push(pl);
 }
 
-/* ── FLOOR (invisible, for shadows) ── */
-const floorGeo = new THREE.CircleGeometry(8, 48);
-const floorMat = new THREE.ShadowMaterial({ opacity: 0.35 });
-const floor = new THREE.Mesh(floorGeo, floorMat);
-floor.rotation.x = -Math.PI / 2;
-floor.position.y = -4;
-floor.receiveShadow = true;
-scene.add(floor);
-
 /* ── PARTICLES ── */
-const particleCount = 120;
 const particleGeo = new THREE.BufferGeometry();
-const positions = new Float32Array(particleCount * 3);
-const particleSizes = new Float32Array(particleCount);
-for (let i = 0; i < particleCount; i++) {
-  positions[i * 3]     = (Math.random() - 0.5) * 20;
-  positions[i * 3 + 1] = Math.random() * 14 - 2;
-  positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
-  particleSizes[i] = Math.random() * 3 + 1;
+const pPos = new Float32Array(160 * 3);
+for (let i = 0; i < 160; i++) {
+  pPos[i * 3]     = (Math.random() - 0.5) * 18;
+  pPos[i * 3 + 1] = Math.random() * 14 - 2;
+  pPos[i * 3 + 2] = (Math.random() - 0.5) * 18;
 }
-particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-particleGeo.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
-const particleMat = new THREE.PointsMaterial({
-  color: 0xffb0d0,
-  size: 0.08,
-  sizeAttenuation: true,
-  transparent: true,
-  opacity: 0.7,
-});
+particleGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const particleMat = new THREE.PointsMaterial({ color: 0xffb0d0, size: 0.06, sizeAttenuation: true, transparent: true, opacity: 0.65 });
 scene.add(new THREE.Points(particleGeo, particleMat));
 
 /* ══════════════════════════════════════════════
-   FLOWER GEOMETRY FACTORIES
+   PHOTOREALISTIC FLOWER SYSTEM
+   Each flower = real photo PNG billboard sprite
 ══════════════════════════════════════════════ */
 
-function makePetalShape(len = 1.0, wid = 0.38) {
-  const s = new THREE.Shape();
-  s.moveTo(0, 0);
-  s.bezierCurveTo( wid * 0.9, len * 0.18,  wid, len * 0.6,  0, len);
-  s.bezierCurveTo(-wid,       len * 0.6, -wid * 0.9, len * 0.18, 0, 0);
-  return s;
-}
+// Real flower photo URLs (Unsplash, free to use)
+const FLOWER_PHOTOS = {
+  rose:          'https://images.unsplash.com/photo-1548547638-91a3d8fc4c7e?w=600&h=600&fit=crop&auto=format&q=85',
+  peony:         'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=600&h=600&fit=crop&auto=format&q=85',
+  tulip:         'https://images.unsplash.com/photo-1520763185298-1b434c919102?w=600&h=600&fit=crop&auto=format&q=85',
+  chrysanthemum: 'https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=600&h=600&fit=crop&auto=format&q=85',
+  lily:          'https://images.unsplash.com/photo-1590736969596-fbf9af5a0f34?w=600&h=600&fit=crop&auto=format&q=85',
+  sunflower:     'https://images.unsplash.com/photo-1497861084185-5b24c20a0cff?w=600&h=600&fit=crop&auto=format&q=85',
+};
 
-function extrudePetal(shape, depth = 0.04) {
-  return new THREE.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: true,
-    bevelThickness: depth * 0.5,
-    bevelSize: depth * 0.3,
-    bevelSegments: 3,
-  });
-}
+// Cache of loaded canvas textures
+const textureCache = {};
 
-function petalMaterial(color, roughness = 0.45, transmission = 0.15) {
-  return new THREE.MeshPhysicalMaterial({
-    color,
-    roughness,
-    metalness: 0,
-    transmission,
-    thickness: 0.1,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.97,
-  });
-}
+// Create a circular-masked canvas texture from a photo URL.
+// The mask creates a soft vignette so the flower blends naturally.
+function buildFlowerTexture(type) {
+  if (textureCache[type]) return textureCache[type];
 
-/* ── ROSE ── */
-function createRoseHead(hexColor) {
-  const group = new THREE.Group();
-  const col = new THREE.Color(hexColor);
-  const mat = petalMaterial(col, 0.4, 0.18);
-  const darkMat = petalMaterial(col.clone().multiplyScalar(0.7), 0.35, 0.12);
+  const sz = 512;
+  const offscreen = document.createElement('canvas');
+  offscreen.width = offscreen.height = sz;
+  const ctx = offscreen.getContext('2d');
 
-  // Outer layer (5 petals, cupped open)
-  const outerShape = makePetalShape(1.1, 0.42);
-  const outerGeo = extrudePetal(outerShape, 0.05);
-  for (let i = 0; i < 5; i++) {
-    const p = new THREE.Mesh(outerGeo, mat);
-    p.rotation.y = (i / 5) * Math.PI * 2;
-    p.rotation.x = -(Math.PI / 2 - 0.55);
-    p.castShadow = true;
-    group.add(p);
-  }
+  const tex = new THREE.CanvasTexture(offscreen);
+  textureCache[type] = tex;
 
-  // Middle layer (5 petals, more upright)
-  const midShape = makePetalShape(0.85, 0.32);
-  const midGeo = extrudePetal(midShape, 0.04);
-  for (let i = 0; i < 5; i++) {
-    const p = new THREE.Mesh(midGeo, mat);
-    p.rotation.y = (i / 5) * Math.PI * 2 + Math.PI / 5;
-    p.rotation.x = -(Math.PI / 2 - 0.3);
-    p.castShadow = true;
-    group.add(p);
-  }
+  // Fill a placeholder color while loading
+  ctx.fillStyle = '#2a1a2a';
+  ctx.fillRect(0, 0, sz, sz);
 
-  // Inner layer (4 petals, tightly furled)
-  const innerShape = makePetalShape(0.55, 0.22);
-  const innerGeo = extrudePetal(innerShape, 0.03);
-  for (let i = 0; i < 4; i++) {
-    const p = new THREE.Mesh(innerGeo, darkMat);
-    p.rotation.y = (i / 4) * Math.PI * 2;
-    p.rotation.x = -(Math.PI / 2 - 0.1);
-    p.castShadow = true;
-    group.add(p);
-  }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    ctx.clearRect(0, 0, sz, sz);
 
-  // Center
-  const cGeo = new THREE.SphereGeometry(0.14, 10, 8);
-  const cMat = new THREE.MeshPhysicalMaterial({ color: col.clone().multiplyScalar(0.6), roughness: 0.3 });
-  group.add(new THREE.Mesh(cGeo, cMat));
+    // Draw photo with slight oval crop (flower shape)
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(sz/2, sz*0.52, sz*0.46, sz*0.48, 0, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, 0, 0, sz, sz);
+    ctx.restore();
 
-  return group;
-}
+    // Soft radial fade at edges
+    const fade = ctx.createRadialGradient(sz/2, sz*0.52, sz*0.28, sz/2, sz*0.52, sz*0.5);
+    fade.addColorStop(0,   'rgba(0,0,0,0)');
+    fade.addColorStop(0.75,'rgba(0,0,0,0)');
+    fade.addColorStop(1,   'rgba(0,0,0,1)');
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, 0, sz, sz);
 
-/* ── PEONY ── */
-function createPeonyHead(hexColor) {
-  const group = new THREE.Group();
-  const col = new THREE.Color(hexColor);
-  const mat = petalMaterial(col, 0.5, 0.2);
-
-  for (let layer = 0; layer < 4; layer++) {
-    const n = 6 + layer * 2;
-    const len = 0.7 + layer * 0.28;
-    const wid = 0.32 + layer * 0.06;
-    const tiltX = -(Math.PI / 2 - 0.1 - layer * 0.14);
-    const shape = makePetalShape(len, wid);
-    const geo = extrudePetal(shape, 0.035);
-    for (let i = 0; i < n; i++) {
-      const p = new THREE.Mesh(geo, mat);
-      p.rotation.y = (i / n) * Math.PI * 2 + (layer * 0.3);
-      p.rotation.x = tiltX;
-      p.castShadow = true;
-      group.add(p);
-    }
-  }
-
-  // Center sphere cluster
-  for (let i = 0; i < 8; i++) {
-    const sGeo = new THREE.SphereGeometry(0.06, 6, 5);
-    const sMat = new THREE.MeshPhysicalMaterial({ color: 0xffdd44, roughness: 0.6 });
-    const s = new THREE.Mesh(sGeo, sMat);
-    const a = (i / 8) * Math.PI * 2;
-    s.position.set(Math.cos(a) * 0.12, 0, Math.sin(a) * 0.12);
-    group.add(s);
-  }
-
-  return group;
-}
-
-/* ── TULIP ── */
-function createTulipHead(hexColor) {
-  const group = new THREE.Group();
-  const col = new THREE.Color(hexColor);
-  const mat = petalMaterial(col, 0.38, 0.22);
-
-  // Tulip: 3 outer + 3 inner petals, forming a cup shape
-  const outerShape = new THREE.Shape();
-  outerShape.moveTo(0, 0);
-  outerShape.bezierCurveTo(0.4, 0.1, 0.45, 0.8, 0.1, 1.4);
-  outerShape.bezierCurveTo(0, 1.5, -0.1, 1.4, -0.1, 1.4);
-  outerShape.bezierCurveTo(-0.45, 0.8, -0.4, 0.1, 0, 0);
-
-  const innerShape = new THREE.Shape();
-  innerShape.moveTo(0, 0);
-  innerShape.bezierCurveTo(0.3, 0.05, 0.35, 0.7, 0.05, 1.3);
-  innerShape.bezierCurveTo(0, 1.4, -0.05, 1.3, -0.05, 1.3);
-  innerShape.bezierCurveTo(-0.35, 0.7, -0.3, 0.05, 0, 0);
-
-  const outerGeo = extrudePetal(outerShape, 0.05);
-  const innerGeo = extrudePetal(innerShape, 0.04);
-  const innerMat = petalMaterial(col.clone().addScalar(0.08), 0.38, 0.25);
-
-  for (let i = 0; i < 3; i++) {
-    const p = new THREE.Mesh(outerGeo, mat);
-    p.rotation.y = (i / 3) * Math.PI * 2;
-    p.rotation.x = -(Math.PI / 2 - 0.75);
-    p.castShadow = true;
-    group.add(p);
-  }
-  for (let i = 0; i < 3; i++) {
-    const p = new THREE.Mesh(innerGeo, innerMat);
-    p.rotation.y = (i / 3) * Math.PI * 2 + Math.PI / 3;
-    p.rotation.x = -(Math.PI / 2 - 0.6);
-    p.castShadow = true;
-    group.add(p);
-  }
-
-  return group;
-}
-
-/* ── CHRYSANTHEMUM ── */
-function createChrysanthemumHead(hexColor) {
-  const group = new THREE.Group();
-  const col = new THREE.Color(hexColor);
-
-  for (let layer = 0; layer < 5; layer++) {
-    const n = 10 + layer * 4;
-    const len = 0.45 + layer * 0.18;
-    const tiltX = -(Math.PI / 2 - layer * 0.18);
-    const mat = petalMaterial(col.clone().multiplyScalar(0.85 + layer * 0.04), 0.55, 0.1);
-    const shape = makePetalShape(len, 0.12);
-    const geo = extrudePetal(shape, 0.02);
-    for (let i = 0; i < n; i++) {
-      const p = new THREE.Mesh(geo, mat);
-      p.rotation.y = (i / n) * Math.PI * 2 + (layer * 0.2);
-      p.rotation.x = tiltX;
-      p.castShadow = true;
-      group.add(p);
-    }
-  }
-
-  const cGeo = new THREE.SphereGeometry(0.18, 10, 8);
-  const cMat = new THREE.MeshPhysicalMaterial({ color: 0xffee44, roughness: 0.5 });
-  group.add(new THREE.Mesh(cGeo, cMat));
-
-  return group;
-}
-
-/* ── LILY ── */
-function createLilyHead(hexColor) {
-  const group = new THREE.Group();
-  const col = new THREE.Color(hexColor);
-  const mat = petalMaterial(col, 0.4, 0.2);
-
-  const shape = new THREE.Shape();
-  shape.moveTo(0, 0);
-  shape.bezierCurveTo(0.3, 0.2, 0.38, 0.7, 0, 1.5);
-  shape.bezierCurveTo(-0.38, 0.7, -0.3, 0.2, 0, 0);
-
-  const geo = extrudePetal(shape, 0.04);
-
-  for (let i = 0; i < 6; i++) {
-    const p = new THREE.Mesh(geo, mat);
-    p.rotation.y = (i / 6) * Math.PI * 2;
-    p.rotation.x = -(Math.PI / 2 - 0.5);
-    p.castShadow = true;
-    group.add(p);
-  }
-
-  // Stamens
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2;
-    const stamenGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.9, 5);
-    const stamenMat = new THREE.MeshPhysicalMaterial({ color: 0x558833, roughness: 0.6 });
-    const stamen = new THREE.Mesh(stamenGeo, stamenMat);
-    stamen.position.set(Math.cos(a) * 0.2, 0.35, Math.sin(a) * 0.2);
-    stamen.rotation.z = -a * 0.3;
-    group.add(stamen);
-
-    const antherGeo = new THREE.SphereGeometry(0.04, 6, 5);
-    const antherMat = new THREE.MeshPhysicalMaterial({ color: 0x442200, roughness: 0.5 });
-    const anther = new THREE.Mesh(antherGeo, antherMat);
-    anther.position.set(Math.cos(a) * 0.22, 0.82, Math.sin(a) * 0.22);
-    group.add(anther);
-  }
-
-  return group;
-}
-
-/* ── SUNFLOWER ── */
-function createSunflowerHead(hexColor) {
-  const group = new THREE.Group();
-  const col = new THREE.Color(hexColor);
-  const mat = petalMaterial(col, 0.55, 0.08);
-
-  const shape = makePetalShape(1.1, 0.28);
-  const geo = extrudePetal(shape, 0.03);
-
-  for (let i = 0; i < 18; i++) {
-    const p = new THREE.Mesh(geo, mat);
-    p.rotation.y = (i / 18) * Math.PI * 2;
-    p.rotation.x = -(Math.PI / 2 - 0.2);
-    p.castShadow = true;
-    group.add(p);
-  }
-
-  // Dark brown disk
-  const diskGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.18, 32);
-  const diskMat = new THREE.MeshPhysicalMaterial({ color: 0x2d1200, roughness: 0.9 });
-  const disk = new THREE.Mesh(diskGeo, diskMat);
-  disk.castShadow = true;
-  group.add(disk);
-
-  // Seed bumps
-  for (let i = 0; i < 32; i++) {
-    const a = (i / 32) * Math.PI * 2;
-    const r = 0.05 + (i % 4) * 0.1;
-    const bGeo = new THREE.SphereGeometry(0.03, 4, 3);
-    const bMat = new THREE.MeshPhysicalMaterial({ color: 0x1a0800, roughness: 0.95 });
-    const b = new THREE.Mesh(bGeo, bMat);
-    b.position.set(Math.cos(a) * r, 0.12, Math.sin(a) * r);
-    group.add(b);
-  }
-
-  return group;
-}
-
-/* ── STEM ── */
-function createStem(from, to) {
-  const dir = to.clone().sub(from);
-  const len = dir.length();
-  const mid = from.clone().add(to).multiplyScalar(0.5);
-
-  const stemGeo = new THREE.CylinderGeometry(0.028, 0.028, len, 6);
-  const stemMat = new THREE.MeshPhysicalMaterial({ color: 0x2a7a35, roughness: 0.75 });
-  const stem = new THREE.Mesh(stemGeo, stemMat);
-  stem.castShadow = true;
-  stem.position.copy(mid);
-  stem.quaternion.setFromUnitVectors(
-    new THREE.Vector3(0, 1, 0),
-    dir.normalize()
-  );
-  return stem;
-}
-
-/* ── LEAF ── */
-function createLeaf(pos, angle) {
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0, 0);
-  leafShape.bezierCurveTo(0.25, 0.1, 0.3, 0.55, 0, 0.8);
-  leafShape.bezierCurveTo(-0.3, 0.55, -0.25, 0.1, 0, 0);
-
-  const leafGeo = new THREE.ExtrudeGeometry(leafShape, { depth: 0.018, bevelEnabled: false });
-  const leafMat = new THREE.MeshPhysicalMaterial({ color: 0x1e6b28, roughness: 0.7, side: THREE.DoubleSide });
-  const leaf = new THREE.Mesh(leafGeo, leafMat);
-  leaf.castShadow = true;
-  leaf.position.copy(pos);
-  leaf.rotation.y = angle;
-  leaf.rotation.x = -Math.PI / 2 + 0.3;
-  return leaf;
-}
-
-/* ── WRAPPING CONE ── */
-function createWrappingMesh(style) {
-  const configs = {
-    none:   { color: null },
-    kraft:  { color: 0xc8a060, roughness: 0.9, metalness: 0 },
-    velvet: { color: 0x5d0f35, roughness: 0.1, metalness: 0.02 },
-    film:   { color: 0xd0eeff, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.45 },
+    tex.needsUpdate = true;
   };
-  const cfg = configs[style] || configs.none;
-  if (!cfg.color) return null;
+  img.onerror = () => {
+    // Fallback: draw a simple circular gradient flower
+    ctx.clearRect(0, 0, sz, sz);
+    const g = ctx.createRadialGradient(sz/2, sz/2, 10, sz/2, sz/2, sz/2);
+    g.addColorStop(0, '#fff');
+    g.addColorStop(0.5, '#ffb0c8');
+    g.addColorStop(1, 'rgba(255,100,150,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(sz/2, sz/2, sz*0.45, sz*0.45, 0, 0, Math.PI*2);
+    ctx.fill();
+    tex.needsUpdate = true;
+  };
+  img.src = FLOWER_PHOTOS[type] || FLOWER_PHOTOS.rose;
+
+  return tex;
+}
+
+// Create a photorealistic flower sprite for given type and hex color.
+// Returns a THREE.Sprite — always faces camera (billboard).
+function createPhotoFlower(type, hexColor) {
+  const tex = buildFlowerTexture(type);
+
+  // Parse tint color — lighten it slightly so it blends well with the photo
+  const col = new THREE.Color(hexColor);
+
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    transparent: true,
+    alphaTest: 0.01,
+    depthWrite: false,
+    color: col,
+    sizeAttenuation: true,
+  });
+
+  const sprite = new THREE.Sprite(mat);
+  return sprite;
+}
+
+/* ══════════════════════════════════════════════
+   WRAPPING SYSTEM (textured cone)
+══════════════════════════════════════════════ */
+
+// Wrapping paper textures
+const WRAP_TEXTURES = {
+  kraft:  'https://images.unsplash.com/photo-1567016546367-19b2d1a6d27c?w=512&h=512&fit=crop&auto=format',
+  velvet: null,  // use material color
+  film:   null,  // transparent
+};
+
+const wrapTextureCache = {};
+
+function getWrapTexture(style) {
+  if (!WRAP_TEXTURES[style]) return null;
+  if (wrapTextureCache[style]) return wrapTextureCache[style];
+  const loader = new THREE.TextureLoader();
+  const t = loader.load(WRAP_TEXTURES[style]);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(2, 2);
+  wrapTextureCache[style] = t;
+  return t;
+}
+
+function createWrappingMesh(style) {
+  if (style === 'none') return null;
 
   const group = new THREE.Group();
 
-  const coneGeo = new THREE.ConeGeometry(1.05, 3.2, 14, 3, true);
-  const coneMat = new THREE.MeshPhysicalMaterial({
+  const configs = {
+    kraft:  { color: 0xc8a060, roughness: 0.95, metalness: 0 },
+    velvet: { color: 0x5d0f35, roughness: 0.05, metalness: 0.02 },
+    film:   { color: 0xd0eeff, roughness: 0.02, metalness: 0, transparent: true, opacity: 0.38 },
+  };
+  const cfg = configs[style];
+
+  const matProps = {
     color: cfg.color,
-    roughness: cfg.roughness ?? 0.6,
+    roughness: cfg.roughness,
     metalness: cfg.metalness ?? 0,
     transparent: cfg.transparent ?? false,
     opacity: cfg.opacity ?? 1,
     side: THREE.DoubleSide,
-  });
-  const cone = new THREE.Mesh(coneGeo, coneMat);
-  cone.position.y = -3;
-  cone.castShadow = true;
+  };
+
+  const wrapTex = getWrapTexture(style);
+  if (wrapTex) matProps.map = wrapTex;
+
+  const mat = new THREE.MeshPhysicalMaterial(matProps);
+  const coneGeo = new THREE.ConeGeometry(1.1, 3.4, 16, 3, true);
+  const cone = new THREE.Mesh(coneGeo, mat);
+  cone.position.y = -3.2;
   group.add(cone);
 
-  // Ribbon bow for velvet
   if (style === 'velvet') {
-    const bowMat = new THREE.MeshPhysicalMaterial({ color: 0xffd700, roughness: 0.2 });
+    const bowMat = new THREE.MeshPhysicalMaterial({ color: 0xffd700, roughness: 0.15 });
     for (let i = 0; i < 2; i++) {
-      const bGeo = new THREE.TorusGeometry(0.22, 0.055, 6, 12, Math.PI);
+      const bGeo = new THREE.TorusGeometry(0.24, 0.06, 8, 14, Math.PI);
       const bow = new THREE.Mesh(bGeo, bowMat);
-      bow.position.y = -1.45;
+      bow.position.y = -1.5;
       bow.rotation.y = i * Math.PI;
       bow.rotation.z = -0.4 + i * 0.8;
       group.add(bow);
@@ -653,42 +453,42 @@ function createWrappingMesh(style) {
 const bouquetGroup = new THREE.Group();
 scene.add(bouquetGroup);
 
-const FLOWER_FACTORIES = {
-  rose:          createRoseHead,
-  peony:         createPeonyHead,
-  tulip:         createTulipHead,
-  chrysanthemum: createChrysanthemumHead,
-  lily:          createLilyHead,
-  sunflower:     createSunflowerHead,
-};
-
 let wrappingMesh = null;
 const stemBase = new THREE.Vector3(0, -1.5, 0);
 
 function fibPoint(index, total, radius) {
-  const phi = Math.PI * (3 - Math.sqrt(5));
-  const y = 1 - (index / Math.max(total - 1, 1)) * 0.7;
-  const r = Math.sqrt(Math.max(0, 1 - y * y)) * radius;
+  const phi   = Math.PI * (3 - Math.sqrt(5));
+  const y     = 1 - (index / Math.max(total - 1, 1)) * 0.65;
+  const r     = Math.sqrt(Math.max(0, 1 - y * y)) * radius;
   const theta = phi * index;
   return new THREE.Vector3(
     Math.cos(theta) * r,
-    y * radius + 0.8,
+    y * radius + 0.6,
     Math.sin(theta) * r
   );
 }
 
-function rebuildBouquet() {
-  // Clear existing
-  while (bouquetGroup.children.length) {
-    bouquetGroup.remove(bouquetGroup.children[0]);
-  }
+// Green stem cylinder
+function createStem(from, to) {
+  const dir = to.clone().sub(from);
+  const len = dir.length();
+  const mid = from.clone().add(to).multiplyScalar(0.5);
+  const geo = new THREE.CylinderGeometry(0.022, 0.022, len, 5);
+  const mat = new THREE.MeshPhysicalMaterial({ color: 0x2a7a35, roughness: 0.8 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(mid);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.normalize());
+  return mesh;
+}
 
-  // Flatten items into individual flowers
+function rebuildBouquet() {
+  // Clear existing flowers
+  while (bouquetGroup.children.length) bouquetGroup.remove(bouquetGroup.children[0]);
+
+  // Flatten items
   const flowers = [];
   for (const item of bouquetItems) {
-    for (let i = 0; i < item.qty; i++) {
-      flowers.push({ type: item.type, color: item.color });
-    }
+    for (let i = 0; i < item.qty; i++) flowers.push({ type: item.type, color: item.color });
   }
 
   const n = flowers.length;
@@ -696,59 +496,38 @@ function rebuildBouquet() {
   emptyMsg.style.display = n === 0 ? 'flex' : 'none';
   if (n === 0) return;
 
-  const radius = Math.min(1.2 + n * 0.06, 2.2);
+  // Radius grows with count, capped for harmony
+  const radius = Math.min(1.0 + n * 0.07, 2.0);
 
   flowers.forEach((f, i) => {
-    const factory = FLOWER_FACTORIES[f.type] || createRoseHead;
-    const head = factory(f.color);
-    head.scale.setScalar(0.72 + Math.random() * 0.14);
+    const sprite = createPhotoFlower(f.type, f.color);
 
-    const pos = fibPoint(i, n, radius);
-    pos.y += (Math.random() - 0.5) * 0.3;
+    const pos  = fibPoint(i, n, radius);
+    // Depth variation: front flowers slightly larger
+    const depthFactor = (pos.z + radius) / (2 * radius); // 0..1
+    const baseSize    = 1.6 + depthFactor * 0.6;         // front flowers bigger
+    const sizeJitter  = 1.0 + (Math.random() - 0.5) * 0.15;
+    sprite.scale.setScalar(baseSize * sizeJitter);
 
-    head.position.copy(pos);
-    // Tilt flower head slightly outward
-    head.lookAt(pos.clone().add(new THREE.Vector3(
-      pos.x * 0.4,
-      pos.y * 0.15,
-      pos.z * 0.4
-    )));
+    pos.y += (Math.random() - 0.5) * 0.2;
+    sprite.position.copy(pos);
 
-    head.rotation.x += Math.random() * 0.25 - 0.12;
-    head.rotation.z += Math.random() * 0.25 - 0.12;
-
-    bouquetGroup.add(head);
+    bouquetGroup.add(sprite);
 
     // Stem
-    const stemEnd = stemBase.clone().add(new THREE.Vector3(
-      pos.x * 0.18,
-      0,
-      pos.z * 0.18
-    ));
-    bouquetGroup.add(createStem(pos.clone().add(new THREE.Vector3(0, -0.2, 0)), stemEnd));
-
-    // Random leaf along stem
-    if (Math.random() > 0.45) {
-      const leafT = 0.3 + Math.random() * 0.4;
-      const leafPos = pos.clone().lerp(stemEnd, leafT);
-      bouquetGroup.add(createLeaf(leafPos, Math.random() * Math.PI * 2));
-    }
+    const stemEnd = stemBase.clone().add(new THREE.Vector3(pos.x * 0.15, 0, pos.z * 0.15));
+    bouquetGroup.add(createStem(pos.clone().add(new THREE.Vector3(0, -0.15, 0)), stemEnd));
   });
 
   // Wrapping
   if (wrappingMesh) bouquetGroup.remove(wrappingMesh);
-  const w = createWrappingMesh(selectedWrap);
-  if (w) {
-    bouquetGroup.add(w);
-    wrappingMesh = w;
-  } else {
-    wrappingMesh = null;
-  }
+  wrappingMesh = createWrappingMesh(selectedWrap);
+  if (wrappingMesh) bouquetGroup.add(wrappingMesh);
 
-  // Animate sparkle lights
+  // Tint sparkle lights to match flowers
   sparkles.forEach((pl, i) => {
     pl.color.set(flowers[i % flowers.length]?.color || 0xffcc44);
-    pl.intensity = 0.8 + Math.random() * 0.4;
+    pl.intensity = 0.7 + Math.random() * 0.3;
   });
 }
 
@@ -759,6 +538,7 @@ function resize() {
   const w = wrap.clientWidth;
   const h = wrap.clientHeight;
   renderer.setSize(w, h, false);
+  composer.setSize(w, h);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
@@ -783,7 +563,7 @@ function animate() {
   // Gentle float of the whole bouquet
   bouquetGroup.position.y = Math.sin(t * 0.7) * 0.06;
 
-  renderer.render(scene, camera);
+  composer.render();
 }
 animate();
 
