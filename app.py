@@ -251,6 +251,11 @@ def builder():
     return render_template("builder.html")
 
 
+@app.route("/game")
+def game():
+    return render_template("game.html", REWARD_THRESHOLD=800)
+
+
 @app.route('/pay_sandbox', methods=['POST'])
 def pay_sandbox():
     data = request.get_json()

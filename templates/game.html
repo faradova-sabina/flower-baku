@@ -1,0 +1,465 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t.game_title }} — DreamBouquet{% endblock %}
+
+{% block hero %}{% endblock %}
+{% block stats %}{% endblock %}
+
+{% block head %}
+<style>
+.site-header { padding-top: 0; }
+.game-page { padding-top: 110px; padding-bottom: 80px; max-width: 720px; margin: 0 auto; }
+
+.game-header { text-align: center; padding: 0 18px 22px; }
+.game-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 8px 0 10px; }
+.game-header h1 em { color: #e0529c; font-style: italic; }
+.game-header p { color: #6b6b73; max-width: 540px; margin: 0 auto; line-height: 1.55; }
+
+.game-stats { display: flex; justify-content: center; gap: 12px; margin: 0 auto 16px; flex-wrap: wrap; }
+.gstat { background: #fff; border: 1px solid #f1d7e6; border-radius: 16px; padding: 10px 20px; min-width: 90px; text-align: center; box-shadow: 0 6px 18px rgba(224,82,156,.07); }
+.gstat .gstat-label { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #b08aa0; font-weight: 600; }
+.gstat .gstat-val { display: block; font-size: 1.55rem; font-weight: 800; color: #2a2a32; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.gstat.is-low .gstat-val { color: #e0529c; }
+
+.game-stage { position: relative; width: min(92vw, 460px); margin: 0 auto; }
+.board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, #fff0f7, #fbe8f1);
+  border: 1px solid #f3cfe2;
+  border-radius: 22px;
+  box-shadow: inset 0 2px 14px rgba(224,82,156,.10), 0 18px 40px rgba(224,82,156,.12);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+.tile {
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: 14px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 3px 7px rgba(0,0,0,.14);
+  cursor: pointer;
+  transition: transform .22s cubic-bezier(.22,.61,.36,1), opacity .18s ease;
+  will-change: transform;
+}
+.tile::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 0 rgba(255,255,255,0);
+  transition: box-shadow .15s ease;
+  pointer-events: none;
+}
+.tile.selected::after { box-shadow: inset 0 0 0 4px #ffffff, inset 0 0 0 7px #e0529c; }
+.tile.clearing { transform: scale(.1) rotate(35deg) !important; opacity: 0; }
+
+.combo-pop {
+  position: absolute; left: 50%; top: 42%;
+  transform: translate(-50%, -50%) scale(.6);
+  font-family: 'Playfair Display', serif;
+  font-weight: 900; font-size: 2.2rem; color: #e0529c;
+  text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(224,82,156,.35);
+  opacity: 0; pointer-events: none; z-index: 30;
+}
+.combo-pop.show { animation: comboPop .8s ease forwards; }
+@keyframes comboPop {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.5); }
+  25% { opacity: 1; transform: translate(-50%,-60%) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%,-95%) scale(1); }
+}
+
+/* Overlays */
+.game-overlay {
+  position: absolute; inset: 0;
+  background: rgba(255, 244, 250, .94);
+  backdrop-filter: blur(3px);
+  border-radius: 22px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 26px; z-index: 40;
+}
+.game-overlay.hidden { display: none; }
+.game-overlay h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; margin: 0 0 6px; color: #2a2a32; }
+.game-overlay p { color: #6b6b73; margin: 0 0 8px; line-height: 1.5; max-width: 320px; }
+.game-overlay .big-score { font-size: 3rem; font-weight: 900; color: #e0529c; font-family: 'Playfair Display', serif; line-height: 1.1; margin: 6px 0; }
+.game-btn {
+  display: inline-block; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #e0529c, #f06ab0);
+  color: #fff; font-weight: 700; font-size: 1.05rem;
+  padding: 14px 34px; border-radius: 40px; margin-top: 14px;
+  box-shadow: 0 10px 24px rgba(224,82,156,.32);
+  transition: transform .15s ease, box-shadow .15s ease;
+  font-family: inherit;
+}
+.game-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(224,82,156,.42); }
+.reward-hint { font-size: .85rem; color: #b08aa0; margin-top: 4px; }
+
+.promo-card {
+  margin-top: 16px; background: #fff; border: 2px dashed #e0529c;
+  border-radius: 16px; padding: 16px 22px; max-width: 320px;
+}
+.promo-card .promo-code {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 1.8rem; letter-spacing: .12em; color: #e0529c; margin: 6px 0;
+}
+.promo-card .promo-wa {
+  display: inline-block; margin-top: 8px; background: #25d366; color: #fff;
+  padding: 9px 20px; border-radius: 30px; font-weight: 700; text-decoration: none;
+  font-size: .92rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-page">
+
+  <div class="game-header">
+    <span class="section-eyebrow">🎮 {{ t.nav_game }}</span>
+    <h1>{{ t.game_title | replace(t.game_title.split()[0], '<em>' + t.game_title.split()[0] + '</em>', 1) | safe }}</h1>
+    <p>{{ t.game_subtitle }}</p>
+  </div>
+
+  <div class="game-stats">
+    <div class="gstat"><span class="gstat-label">{{ t.game_score }}</span><span class="gstat-val" id="g-score">0</span></div>
+    <div class="gstat" id="g-time-wrap"><span class="gstat-label">{{ t.game_time }}</span><span class="gstat-val" id="g-time">60</span></div>
+    <div class="gstat"><span class="gstat-label">{{ t.game_best }}</span><span class="gstat-val" id="g-best">0</span></div>
+  </div>
+
+  <div class="game-stage">
+    <div class="board" id="board">
+      <div class="combo-pop" id="combo-pop"></div>
+
+      <!-- Start screen -->
+      <div class="game-overlay" id="overlay-start">
+        <h2>{{ t.game_title }}</h2>
+        <p>{{ t.game_how_to }}</p>
+        <button class="game-btn" id="btn-start">{{ t.game_start }}</button>
+        <p class="reward-hint">{{ t.game_reward_hint.replace('{n}', REWARD_THRESHOLD|string) }}</p>
+      </div>
+
+      <!-- Game over screen -->
+      <div class="game-overlay hidden" id="overlay-over">
+        <h2>{{ t.game_over }}</h2>
+        <p>{{ t.game_final_score }}</p>
+        <div class="big-score" id="final-score">0</div>
+
+        <div class="promo-card hidden" id="promo-card">
+          <strong style="color:#2a2a32;">{{ t.game_reward_unlocked }}</strong>
+          <p style="margin:6px 0 0;font-size:.85rem;">{{ t.game_promo_desc }}</p>
+          <div class="promo-code">BLOOM10</div>
+          <a class="promo-wa" target="_blank"
+             href="https://wa.me/994702011930?text=BLOOM10">💬 WhatsApp</a>
+        </div>
+        <p class="reward-hint hidden" id="reward-miss">{{ t.game_reward_hint.replace('{n}', REWARD_THRESHOLD|string) }}</p>
+
+        <button class="game-btn" id="btn-restart">{{ t.game_restart }}</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const SIZE = 8;
+  const GAME_SECONDS = 60;
+  const REWARD_THRESHOLD = {{ REWARD_THRESHOLD }};
+  const BEST_KEY = 'dreambouquet_match3_best';
+
+  const FLOWERS = [
+    "{{ url_for('static', filename='images/flowers/rose.jpg') }}",
+    "{{ url_for('static', filename='images/flowers/peony.jpg') }}",
+    "{{ url_for('static', filename='images/flowers/tulip.jpg') }}",
+    "{{ url_for('static', filename='images/flowers/lily.jpg') }}",
+    "{{ url_for('static', filename='images/flowers/sunflower.jpg') }}",
+    "{{ url_for('static', filename='images/flowers/chrysanthemum.jpg') }}",
+  ];
+  const TYPES = FLOWERS.length;
+
+  const boardEl   = document.getElementById('board');
+  const scoreEl   = document.getElementById('g-score');
+  const timeEl    = document.getElementById('g-time');
+  const timeWrap  = document.getElementById('g-time-wrap');
+  const bestEl    = document.getElementById('g-best');
+  const comboPop  = document.getElementById('combo-pop');
+  const overlayStart = document.getElementById('overlay-start');
+  const overlayOver  = document.getElementById('overlay-over');
+  const finalScoreEl = document.getElementById('final-score');
+  const promoCard    = document.getElementById('promo-card');
+  const rewardMiss   = document.getElementById('reward-miss');
+
+  let cells = [];          // cells[r][c] = { type, el } | null
+  let score = 0;
+  let timeLeft = GAME_SECONDS;
+  let timerId = null;
+  let busy = false;        // input lock during animations
+  let running = false;
+  let selected = null;     // { r, c }
+  let pointer = null;      // { r, c, x, y }
+
+  // ---- helpers ----
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const rnd = () => Math.floor(Math.random() * TYPES);
+  // translate is relative to the tile's OWN size (= one cell), so each step is 100%
+  function cellPct(i) { return i * 100; }
+
+  function makeTile(type, r, c, startRow) {
+    const el = document.createElement('div');
+    el.className = 'tile';
+    el.style.width = el.style.height = (100 / SIZE) + '%';
+    el.style.backgroundImage = `url('${FLOWERS[type]}')`;
+    // small inset so tiles don't touch
+    el.style.padding = '0';
+    el.style.transform = `translate(${cellPct(c)}%, ${cellPct(startRow ?? r)}%) scale(.92)`;
+    boardEl.appendChild(el);
+    return { type, el };
+  }
+
+  function layout() {
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = cells[r][c];
+        if (cell) cell.el.style.transform = `translate(${cellPct(c)}%, ${cellPct(r)}%) scale(.92)`;
+      }
+    }
+  }
+
+  // Build a starting board with no pre-existing matches
+  function buildBoard() {
+    boardEl.querySelectorAll('.tile').forEach(t => t.remove());
+    cells = [];
+    for (let r = 0; r < SIZE; r++) {
+      cells[r] = [];
+      for (let c = 0; c < SIZE; c++) {
+        let type;
+        do { type = rnd(); }
+        while (
+          (c >= 2 && cells[r][c-1].type === type && cells[r][c-2].type === type) ||
+          (r >= 2 && cells[r-1][c].type === type && cells[r-2][c].type === type)
+        );
+        cells[r][c] = makeTile(type, r, c);
+      }
+    }
+    // force reflow then settle into place
+    boardEl.offsetHeight;
+    layout();
+  }
+
+  function findMatches() {
+    const matched = new Set();
+    // horizontal
+    for (let r = 0; r < SIZE; r++) {
+      let run = 1;
+      for (let c = 1; c <= SIZE; c++) {
+        const same = c < SIZE && cells[r][c] && cells[r][c-1] && cells[r][c].type === cells[r][c-1].type;
+        if (same) { run++; }
+        else { if (run >= 3) for (let k = c - run; k < c; k++) matched.add(r + ',' + k); run = 1; }
+      }
+    }
+    // vertical
+    for (let c = 0; c < SIZE; c++) {
+      let run = 1;
+      for (let r = 1; r <= SIZE; r++) {
+        const same = r < SIZE && cells[r][c] && cells[r-1][c] && cells[r][c].type === cells[r-1][c].type;
+        if (same) { run++; }
+        else { if (run >= 3) for (let k = r - run; k < r; k++) matched.add(k + ',' + c); run = 1; }
+      }
+    }
+    return matched;
+  }
+
+  function showCombo(n) {
+    comboPop.textContent = (n > 1 ? n + 'x ' : '') + '{{ t.game_combo }}!';
+    comboPop.classList.remove('show');
+    void comboPop.offsetWidth;
+    comboPop.classList.add('show');
+  }
+
+  async function resolveCascades() {
+    let combo = 0;
+    while (true) {
+      const matched = findMatches();
+      if (matched.size === 0) break;
+      combo++;
+      if (combo >= 2) showCombo(combo);
+
+      // score: 10 per tile * combo multiplier
+      score += matched.size * 10 * combo;
+      updateScore();
+
+      // animate out
+      matched.forEach(key => {
+        const [r, c] = key.split(',').map(Number);
+        if (cells[r][c]) cells[r][c].el.classList.add('clearing');
+      });
+      await sleep(190);
+      matched.forEach(key => {
+        const [r, c] = key.split(',').map(Number);
+        if (cells[r][c]) { cells[r][c].el.remove(); cells[r][c] = null; }
+      });
+
+      // gravity + refill per column
+      for (let c = 0; c < SIZE; c++) {
+        // collapse existing downward
+        let write = SIZE - 1;
+        for (let r = SIZE - 1; r >= 0; r--) {
+          if (cells[r][c]) {
+            if (write !== r) { cells[write][c] = cells[r][c]; cells[r][c] = null; }
+            write--;
+          }
+        }
+        // fill empty top slots with new tiles dropping from above
+        let spawn = -1;
+        for (let r = write; r >= 0; r--) {
+          cells[r][c] = makeTile(rnd(), r, c, spawn);
+          spawn--;
+        }
+      }
+      boardEl.offsetHeight; // reflow so new tiles start above
+      layout();
+      await sleep(230);
+    }
+  }
+
+  function adjacent(a, b) {
+    return Math.abs(a.r - b.r) + Math.abs(a.c - b.c) === 1;
+  }
+
+  async function trySwap(a, b) {
+    if (busy || !running) return;
+    busy = true;
+    clearSelection();
+
+    // swap data
+    const tmp = cells[a.r][a.c];
+    cells[a.r][a.c] = cells[b.r][b.c];
+    cells[b.r][b.c] = tmp;
+    layout();
+    await sleep(220);
+
+    if (findMatches().size === 0) {
+      // illegal — swap back
+      const t2 = cells[a.r][a.c];
+      cells[a.r][a.c] = cells[b.r][b.c];
+      cells[b.r][b.c] = t2;
+      layout();
+      await sleep(220);
+    } else {
+      await resolveCascades();
+    }
+    busy = false;
+  }
+
+  function clearSelection() {
+    if (selected && cells[selected.r] && cells[selected.r][selected.c]) {
+      cells[selected.r][selected.c].el.classList.remove('selected');
+    }
+    selected = null;
+  }
+
+  function selectCell(r, c) {
+    if (selected && selected.r === r && selected.c === c) { clearSelection(); return; }
+    if (selected && adjacent(selected, { r, c })) {
+      trySwap(selected, { r, c });
+      return;
+    }
+    clearSelection();
+    selected = { r, c };
+    if (cells[r][c]) cells[r][c].el.classList.add('selected');
+  }
+
+  // ---- pointer input (tap to select OR swipe to swap) ----
+  function cellFromEvent(e) {
+    const rect = boardEl.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const c = Math.floor(x / (rect.width / SIZE));
+    const r = Math.floor(y / (rect.height / SIZE));
+    if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) return null;
+    return { r, c, x: e.clientX, y: e.clientY };
+  }
+
+  boardEl.addEventListener('pointerdown', (e) => {
+    if (busy || !running) return;
+    const cell = cellFromEvent(e);
+    if (cell) pointer = cell;
+  });
+
+  boardEl.addEventListener('pointerup', (e) => {
+    if (busy || !running || !pointer) { pointer = null; return; }
+    const rect = boardEl.getBoundingClientRect();
+    const threshold = (rect.width / SIZE) * 0.35;
+    const dx = e.clientX - pointer.x;
+    const dy = e.clientY - pointer.y;
+
+    if (Math.max(Math.abs(dx), Math.abs(dy)) > threshold) {
+      // swipe → directional swap
+      let nr = pointer.r, nc = pointer.c;
+      if (Math.abs(dx) > Math.abs(dy)) nc += dx > 0 ? 1 : -1;
+      else nr += dy > 0 ? 1 : -1;
+      if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+        clearSelection();
+        trySwap({ r: pointer.r, c: pointer.c }, { r: nr, c: nc });
+      }
+    } else {
+      // tap → selection logic
+      selectCell(pointer.r, pointer.c);
+    }
+    pointer = null;
+  });
+
+  // ---- score / timer / game flow ----
+  function updateScore() {
+    scoreEl.textContent = score;
+    const best = getBest();
+    if (score > best) bestEl.textContent = score;
+  }
+  function getBest() { return parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0; }
+  function saveBest() {
+    if (score > getBest()) localStorage.setItem(BEST_KEY, String(score));
+  }
+
+  function tick() {
+    timeLeft--;
+    timeEl.textContent = timeLeft;
+    timeWrap.classList.toggle('is-low', timeLeft <= 10);
+    if (timeLeft <= 0) endGame();
+  }
+
+  function startGame() {
+    score = 0; timeLeft = GAME_SECONDS;
+    updateScore();
+    timeEl.textContent = timeLeft;
+    timeWrap.classList.remove('is-low');
+    overlayStart.classList.add('hidden');
+    overlayOver.classList.add('hidden');
+    buildBoard();
+    running = true; busy = false; selected = null;
+    clearInterval(timerId);
+    timerId = setInterval(tick, 1000);
+  }
+
+  function endGame() {
+    clearInterval(timerId);
+    running = false; busy = true;
+    saveBest();
+    bestEl.textContent = getBest();
+    finalScoreEl.textContent = score;
+    const won = score >= REWARD_THRESHOLD;
+    promoCard.classList.toggle('hidden', !won);
+    rewardMiss.classList.toggle('hidden', won);
+    overlayOver.classList.remove('hidden');
+  }
+
+  document.getElementById('btn-start').addEventListener('click', startGame);
+  document.getElementById('btn-restart').addEventListener('click', startGame);
+
+  // init
+  bestEl.textContent = getBest();
+})();
+</script>
+{% endblock %}
